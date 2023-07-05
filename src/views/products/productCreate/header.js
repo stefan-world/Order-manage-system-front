@@ -7,26 +7,14 @@ import {
   Button,
   Grid,
   Link,
-  SvgIcon,
   Typography,
   makeStyles
 } from '@material-ui/core';
-import {
-  PlusCircle as PlusCircleIcon,
-} from 'react-feather';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
-const useStyles = makeStyles((theme) => ({
-  root: {},
-  action: {
-    marginBottom: theme.spacing(1),
-    '& + &': {
-      marginLeft: theme.spacing(1)
-    }
-  },
-  actionIcon: {
-    marginRight: theme.spacing(1)
-  }
+const useStyles = makeStyles(() => ({
+  root: {marginLeft:'30px',
+  width:'95%'}
 }));
 
 function Header({ className, ...rest }) {
@@ -53,41 +41,34 @@ function Header({ className, ...rest }) {
           >
             Dashboard
           </Link>
+          <Link
+            variant="body1"
+            color="inherit"
+            to="/app/products/productList"
+            component={RouterLink}
+          >
+            Products
+          </Link>
           <Typography
             variant="body1"
             color="textPrimary"
           >
-            Suppliers
-          </Typography>
-          <Typography
-            variant="body1"
-            color="textPrimary"
-          >
-            Supplier List
+            Create Products
           </Typography>
         </Breadcrumbs>
         <Typography
           variant="h3"
           color="textPrimary"
         >
-          All Suppliers
+          Please Save a new product!
         </Typography>
       </Grid>
       <Grid item>
         <Button
-          color="secondary"
-          variant="contained"
-          className={classes.action}
           component={RouterLink}
-          to='/app/suppliers/supplierRecord'
+          to="/app/products/productList"
         >
-          <SvgIcon
-            fontSize="small"
-            className={classes.actionIcon}
-          >
-            <PlusCircleIcon />
-          </SvgIcon>
-          New Supplier
+          Cancel
         </Button>
       </Grid>
     </Grid>

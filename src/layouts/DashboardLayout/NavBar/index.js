@@ -15,11 +15,9 @@ import {
   Link,
   List,
   ListSubheader,
-  Typography,
   makeStyles
 } from '@material-ui/core';
 import ReceiptIcon from '@material-ui/icons/ReceiptOutlined';
-import Expenses from '@material-ui/icons/Payment';
 import {
   ShoppingCart as ShoppingCartIcon,
   User as UserIcon,
@@ -59,31 +57,31 @@ const navConfig = [
   },
 
   {
-    subheader: 'Orders',
+    subheader: 'Products',
     items: [
       {
         title: 'Products List',
         icon: ShoppingCartIcon,
-        href: '/app/stores/productList'
+        href: '/app/products/productList'
       },
       {
         title: 'Create Product',
         icon: EditIcon,
-        href: '/app/stores/productCreate'
+        href: '/app/products/productCreate'
       }
     ]
   },
 
-  // {
-  //   subheader: 'Expenses',
-  //   items: [
-  //     {
-  //       title: 'Expense Payment',
-  //       icon: Expenses,
-  //       href: '/app/expenses'
-  //     }
-  //   ]
-  // },
+  {
+    subheader: 'Orders',
+    items: [
+      {
+        title: 'Orders List',
+        icon: ShoppingCartIcon,
+        href: '/app/orders/ordersList'
+      },
+    ]
+  },
 
   {
     subheader: 'Users',
@@ -91,18 +89,18 @@ const navConfig = [
       {
         title: 'Accounts List',
         icon: UsersIcon,
-        href: '/app/partners/list'
+        href: '/app/accounts/list'
       },
       {
         title: 'Add Account',
         icon: UserIcon,
-        href: '/app/partners/add'
+        href: '/app/accounts/add'
       }
     ]
   }
 ];
 
-const navConfigPartner = [
+const navConfigAccount = [
   {
     subheader: 'Reports',
     items: [
@@ -131,31 +129,30 @@ const navConfigPartner = [
   },
 
   {
-    subheader: 'Orders',
+    subheader: 'Products',
     items: [
       {
         title: 'Products List',
         icon: ShoppingCartIcon,
-        href: '/app/stores/productList'
+        href: '/app/products/productList'
       },
       {
         title: 'Create Product',
         icon: EditIcon,
-        href: '/app/stores/productCreate'
+        href: '/app/products/productCreate'
       }
     ]
   },
-
-  // {
-  //   subheader: 'Expenses',
-  //   items: [
-  //     {
-  //       title: 'Expense Payment',
-  //       icon: Expenses,
-  //       href: '/app/expenses'
-  //     }
-  //   ]
-  // }
+  {
+    subheader: 'Orders',
+    items: [
+      {
+        title: 'Orders List',
+        icon: ShoppingCartIcon,
+        href: '/app/orders/ordersList'
+      },
+    ]
+  },
 ];
 
 function renderNavItems({ items, ...rest }) {
@@ -309,7 +306,7 @@ function NavBar({ openMobile, onMobileClose, }) {
         }
        { (user.role !== "admin") &&
         <Box p={2}>
-          {navConfigPartner.map((config) => (
+          {navConfigAccount.map((config) => (
             <List
               key={config.subheader}
               subheader={(

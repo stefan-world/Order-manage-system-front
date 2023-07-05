@@ -2,7 +2,6 @@ import React, {
   useRef,
   useState
 } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';

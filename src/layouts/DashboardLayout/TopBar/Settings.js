@@ -69,6 +69,7 @@ function Settings() {
         <Badge
           color="secondary"
           variant="dot"
+          overlap="rectangular"
           classes={{ badge: classes.badge }}
         >
           <IconButton

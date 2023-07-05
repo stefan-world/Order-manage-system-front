@@ -57,38 +57,21 @@ function Header({ className, ...rest }) {
             variant="body1"
             color="textPrimary"
           >
-            Suppliers
+            Orders
           </Typography>
           <Typography
             variant="body1"
             color="textPrimary"
           >
-            Supplier List
+            Orders List
           </Typography>
         </Breadcrumbs>
         <Typography
           variant="h3"
           color="textPrimary"
         >
-          All Suppliers
+          All Orders
         </Typography>
-      </Grid>
-      <Grid item>
-        <Button
-          color="secondary"
-          variant="contained"
-          className={classes.action}
-          component={RouterLink}
-          to='/app/suppliers/supplierRecord'
-        >
-          <SvgIcon
-            fontSize="small"
-            className={classes.actionIcon}
-          >
-            <PlusCircleIcon />
-          </SvgIcon>
-          New Supplier
-        </Button>
       </Grid>
     </Grid>
   );

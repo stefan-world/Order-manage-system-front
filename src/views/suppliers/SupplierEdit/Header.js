@@ -28,7 +28,7 @@ function Header({ className, ...rest }) {
     <Grid
       container
       spacing={3}
-      justify="space-between"
+      justifyContent="space-between"
       className={clsx(classes.root, className)}
       {...rest}
     >
@@ -55,14 +55,14 @@ function Header({ className, ...rest }) {
             variant="body1"
             color="textPrimary"
           >
-            Edit Invoice
+            Edit Supplier
           </Typography>
         </Breadcrumbs>
         <Typography
           variant="h3"
           color="textPrimary"
         >
-          Please Edit invoice!
+          Please Edit Supplier!
         </Typography>
       </Grid>
     </Grid>

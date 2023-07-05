@@ -66,41 +66,51 @@ const routesConfig = [
       },
       {
         exact: true,
-        path: '/app/stores/productList',
-        component: lazy(() => import('src/views/stores/productList'))
+        path: '/app/products/productList',
+        component: lazy(() => import('src/views/products/productList'))
       },
       {
         exact: true,
-        path: '/app/stores/productCreate',
-        component: lazy(() => import('src/views/stores/productCreate'))
+        path: '/app/products/productCreate',
+        component: lazy(() => import('src/views/products/productCreate'))
       },
       {
         exact: true,
-        path: '/app/stores/productEdit/:Id',
-        component: lazy(() => import('src/views/stores/ProductEdit'))
+        path: '/app/products/productEdit/:Id',
+        component: lazy(() => import('src/views/products/ProductEdit'))
       },
       {
         exact: true,
-        path: '/app/expenses',
-        component: lazy(() => import('src/views/expenses'))
+        path: '/app/orders/ordersList',
+        component: lazy(() => import('src/views/orders/ordersList'))
+      },
+      {
+        exact: true,
+        path: '/app/orders/orderedItemsList',
+        component: lazy(() => import('src/views/orders/orderedItemsList'))
+      },
+      {
+        exact: true,
+        path: '/app/orders/editOrder/:Id',
+        component: lazy(() => import('src/views/orders/editOrder'))
       },
       {
         exact: true,
         guard: adminGuard,
-        path: '/app/partners/list',
-        component: lazy(() => import('src/views/partners/list partners'))
+        path: '/app/accounts/list',
+        component: lazy(() => import('src/views/accounts/accountsList'))
       },
       {
         exact: true,
         guard: adminGuard,
-        path: '/app/partners/add',
-        component: lazy(() => import('src/views/partners/add partners'))
+        path: '/app/accounts/add',
+        component: lazy(() => import('src/views/accounts/createAccount'))
       },
       {
         exact: true,
         guard: adminGuard,
-        path: '/app/partners/edit/:partnerId',
-        component: lazy(() => import('src/views/partners/edit partners'))
+        path: '/app/accounts/edit/:accountId',
+        component: lazy(() => import('src/views/accounts/editAccount'))
       },
       {
         component:() => <Redirect to='/404' />

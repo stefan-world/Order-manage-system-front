@@ -14,7 +14,6 @@ import {
   colors,
   makeStyles
 } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
 import LockIcon from '@material-ui/icons/Lock';
 import Page from 'src/components/Page';
 import Logo from 'src/components/Logo';

@@ -17,7 +17,9 @@ import { SettingsProvider } from 'src/context/SettingsContext';
 import { configureStore } from 'src/store';
 import { restoreSettings } from 'src/utils/settings';
 import App from 'src/App';
+import dotenv from 'dotenv';
 
+dotenv.config();
 enableES5();
 
 const store = configureStore();

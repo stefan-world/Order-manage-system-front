@@ -11,10 +11,10 @@ import {
   Typography,
   makeStyles
 } from '@material-ui/core';
-import {
-  PlusCircle as PlusCircleIcon,
-} from 'react-feather';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import {
+  PlusCircle as PlusCircleIcon
+} from 'react-feather';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -53,24 +53,26 @@ function Header({ className, ...rest }) {
           >
             Dashboard
           </Link>
+          <Link
+            variant="body1"
+            color="inherit"
+            to="/app/management"
+            component={RouterLink}
+          >
+            Users
+          </Link>
           <Typography
             variant="body1"
             color="textPrimary"
           >
-            Suppliers
-          </Typography>
-          <Typography
-            variant="body1"
-            color="textPrimary"
-          >
-            Supplier List
+            Accounts List
           </Typography>
         </Breadcrumbs>
         <Typography
           variant="h3"
           color="textPrimary"
         >
-          All Suppliers
+          All Accounts
         </Typography>
       </Grid>
       <Grid item>
@@ -79,7 +81,7 @@ function Header({ className, ...rest }) {
           variant="contained"
           className={classes.action}
           component={RouterLink}
-          to='/app/suppliers/supplierRecord'
+          to='/app/accounts/add'
         >
           <SvgIcon
             fontSize="small"
@@ -87,7 +89,7 @@ function Header({ className, ...rest }) {
           >
             <PlusCircleIcon />
           </SvgIcon>
-          New Supplier
+          Add New Account
         </Button>
       </Grid>
     </Grid>

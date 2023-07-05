@@ -27,40 +27,40 @@ const useStyles = makeStyles((theme) => ({
 function InvoiceListView() {
   const classes = useStyles();
   const { user } = useSelector((state) => state.account);
-  const [suppliers, setSupplier] = useState([]);
+  const [orders, setOrders] = useState([]);
 
-  const getSuppliers = useCallback(() => {
-    axios.get(API_BASE_URL + 'suppliers/list/' + user._id)
+  const getOrders = useCallback(() => {
+    axios.get(API_BASE_URL + 'ordersList/list/' + user._id)
     .then((response) => {
-      setSupplier(response.data.suppliers);
+      setOrders(response.data.orders);
     });
   }, [user._id]);
 
   useEffect(() => {
-    getSuppliers();
-  }, [getSuppliers]);
+    getOrders();
+  }, [getOrders]);
 
-  if (!suppliers) {
+  if (!orders) {
     return null;
   }
 
-  const ondelete =(supplierId) =>{
+  const ondelete =(orderId) =>{
       axios
-      .get(API_BASE_URL + 'suppliers/delete/'+supplierId)
+      .get(API_BASE_URL + 'ordersList/delete/'+orderId)
       .then((response) => {
-        setSupplier(response.data.suppliers);
+        setOrders(response.data.orders);
       });
   }
 
   return (
     <Page
       className={classes.root}
-      title="Supplier List"
+      title="Orders List"
     >
       <Container maxWidth={false}>
         <Header />
           <Box mt={15}>
-            <Results suppliers={suppliers} deleteSupplier={ondelete}/>
+            <Results orders={orders} deleteOrder={ondelete}/>
           </Box>
       </Container>
     </Page>

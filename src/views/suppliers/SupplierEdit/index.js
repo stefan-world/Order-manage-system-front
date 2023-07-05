@@ -14,8 +14,8 @@ import {
 import Page from 'src/components/Page';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import axios from 'src/utils/axios';
-import RegisterForm from './RegisterForm';
-import Header from './Header';
+import RegisterForm from './body';
+import Header from './header';
 import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from 'src/config';
 
@@ -48,7 +48,7 @@ function RegisterView() {
           setSupplier(response.data.supplier);
         }
       });
-  }, [isMountedRef]);
+  }, [isMountedRef, id]);
 
   useEffect(() => {
     getSuppliers();

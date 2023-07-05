@@ -2,6 +2,7 @@ import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
+import axios from 'src/utils/axios';
 import {
   Breadcrumbs,
   Button,
@@ -11,10 +12,13 @@ import {
   Typography,
   makeStyles
 } from '@material-ui/core';
-import {
-  PlusCircle as PlusCircleIcon,
-} from 'react-feather';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
+import { API_BASE_URL } from 'src/config';
+import { useLocation } from 'react-router-dom';
+import UpdateIcon from '@material-ui/icons/Update'
+import { Edit as EditIcon } from 'react-feather';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -29,15 +33,32 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+
 function Header({ className, ...rest }) {
+  const location = useLocation();
   const classes = useStyles();
+  const { user } = useSelector((state)=>state.account);
+  const history = useHistory();
+
+  const searchParams = new URLSearchParams(location.search);
+    const id = searchParams.get('Id');
+
+  const orderProducts = () => {
+    const status = document.getElementsByName('status')[0].value;
+    axios.post(API_BASE_URL + 'ordersList/updateState/', {
+       'id': id,
+       'status': status,
+     }).then(res => {
+      history.push('/app/orders/ordersList')
+     })
+   }
 
   return (
     <Grid
-      className={clsx(classes.root, className)}
       container
-      justifyContent="space-between"
       spacing={3}
+      justifyContent="space-between"
+      className={clsx(classes.root, className)}
       {...rest}
     >
       <Grid item>
@@ -53,24 +74,26 @@ function Header({ className, ...rest }) {
           >
             Dashboard
           </Link>
+          <Link
+            variant="body1"
+            color="inherit"
+            to="/app/orders/ordersList"
+            component={RouterLink}
+          >
+            Orders
+          </Link>
           <Typography
             variant="body1"
             color="textPrimary"
           >
-            Suppliers
-          </Typography>
-          <Typography
-            variant="body1"
-            color="textPrimary"
-          >
-            Supplier List
+            Ordered Items List
           </Typography>
         </Breadcrumbs>
         <Typography
           variant="h3"
           color="textPrimary"
         >
-          All Suppliers
+          This is Ordered Items List!
         </Typography>
       </Grid>
       <Grid item>
@@ -78,16 +101,30 @@ function Header({ className, ...rest }) {
           color="secondary"
           variant="contained"
           className={classes.action}
-          component={RouterLink}
-          to='/app/suppliers/supplierRecord'
+          onClick={ () => orderProducts(user._id) }
         >
           <SvgIcon
             fontSize="small"
             className={classes.actionIcon}
           >
-            <PlusCircleIcon />
+            <UpdateIcon />
           </SvgIcon>
-          New Supplier
+          Update Status
+        </Button>
+        <Button
+          color="secondary"
+          variant="contained"
+          className={classes.action}
+          to={"/app/orders/editOrder/"+id}
+          component={RouterLink}
+        >
+          <SvgIcon
+            fontSize="small"
+            className={classes.actionIcon}
+          >
+            <EditIcon />
+          </SvgIcon>
+          Edit Order
         </Button>
       </Grid>
     </Grid>

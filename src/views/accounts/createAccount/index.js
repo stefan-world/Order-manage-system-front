@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink} from 'react-router-dom';
 import { useHistory } from 'react-router';
 import {
   Box,
@@ -28,26 +28,26 @@ function RegisterView() {
   const classes = useStyles();
   const history = useHistory();
 
+
   const handleSubmitSuccess = () => {
-    history.push('/app/suppliers/supplierReport');
+    history.push('/app/accounts/list');
   };
 
   return (
     <Page
       className={classes.root}
-      title="Create supplier"
+      title="Accounts creating"
     > 
        <Header />
       <Container maxWidth="sm">
         <Card>
           <CardContent>
             <Typography
-              gutterBottom
+              align='center'
               variant="h2"
               color="textPrimary"
-              align='center'
             >
-              New Supplier
+              Account creating page
             </Typography>
             <Box mt={3}>
               <RegisterForm onSubmitSuccess={handleSubmitSuccess} />
@@ -57,11 +57,11 @@ function RegisterView() {
             </Box>
             <Link
               component={RouterLink}
-              to="/app/suppliers/supplierReport"
+              to="/app/accounts/list"
               variant="body2"
               color="textSecondary"
             >
-              Go supplier list
+              go to Accounts list
             </Link>
           </CardContent>
         </Card>

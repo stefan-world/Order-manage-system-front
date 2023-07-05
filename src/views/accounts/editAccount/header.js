@@ -4,25 +4,17 @@ import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import {
   Breadcrumbs,
-  Button,
   Grid,
   Link,
-  SvgIcon,
   Typography,
   makeStyles
 } from '@material-ui/core';
-import {
-  PlusCircle as PlusCircleIcon,
-} from 'react-feather';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
 const useStyles = makeStyles((theme) => ({
-  root: {},
-  action: {
-    marginBottom: theme.spacing(1),
-    '& + &': {
-      marginLeft: theme.spacing(1)
-    }
+  root: {
+    marginTop:'15px',
+    marginLeft:'10px',
   },
   actionIcon: {
     marginRight: theme.spacing(1)
@@ -34,10 +26,10 @@ function Header({ className, ...rest }) {
 
   return (
     <Grid
-      className={clsx(classes.root, className)}
       container
-      justifyContent="space-between"
       spacing={3}
+      justifyContent="space-between"
+      className={clsx(classes.root, className)}
       {...rest}
     >
       <Grid item>
@@ -57,38 +49,21 @@ function Header({ className, ...rest }) {
             variant="body1"
             color="textPrimary"
           >
-            Suppliers
+            Users
           </Typography>
           <Typography
             variant="body1"
             color="textPrimary"
           >
-            Supplier List
+            Edit Account
           </Typography>
         </Breadcrumbs>
         <Typography
           variant="h3"
           color="textPrimary"
         >
-          All Suppliers
+          Please edit account info!
         </Typography>
-      </Grid>
-      <Grid item>
-        <Button
-          color="secondary"
-          variant="contained"
-          className={classes.action}
-          component={RouterLink}
-          to='/app/suppliers/supplierRecord'
-        >
-          <SvgIcon
-            fontSize="small"
-            className={classes.actionIcon}
-          >
-            <PlusCircleIcon />
-          </SvgIcon>
-          New Supplier
-        </Button>
       </Grid>
     </Grid>
   );
