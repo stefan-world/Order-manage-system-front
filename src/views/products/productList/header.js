@@ -58,7 +58,7 @@ function Header({ className, ...rest }) {
       axios.post(API_BASE_URL + 'ordersList/create/', {
         'products_id': checkedRows,
         'products_quantity': quantity,
-        'account_id': id,
+        'user_id': id,
       }).then(res => {
         history.push("/app/orders/orderedItemsList/?Id=" + res.data.order._id + "&status=" + res.data.order.status + "&supplier=" + res.data.order.supplier_id)
       })

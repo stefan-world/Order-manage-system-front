@@ -20,7 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectOrder } from 'src/actions/checkboxAction';
 import { useHistory } from 'react-router';
 import { API_BASE_URL } from 'src/config';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -37,16 +37,18 @@ const useStyles = makeStyles((theme) => ({
 
 
 function Header({ className, ...rest }) {
+  const location = useLocation()
   const classes = useStyles();
   const { user } = useSelector((state) => state.account);
   const dispatch = useDispatch();
   const { checkedRows } = useSelector((state) => state.selectedRows);
   const history = useHistory();
-  const params = useParams();
   let quantityFlag = false;
+  const searchParams = new URLSearchParams(location.search);
 
   const updateProducts = () => {
-    let id = params.Id;
+    let id = searchParams.get('Id');
+    let status = searchParams.get('status');
     const quantity = checkedRows.map((product_id) => {
       const productQT = document.getElementsByName(product_id + "-quantity")[0].value;
       if (productQT == '')
@@ -62,9 +64,9 @@ function Header({ className, ...rest }) {
         'order_id': id,
         'products_id': checkedRows,
         'products_quantity': quantity,
-        'account_id': user._id,
+        'account_id': user.account_id,
       }).then(res => {
-        history.push("/app/orders/orderedItemsList/?Id=" + res.data.order._id + "&status=" + res.data.order.status + "&date=" + res.data.order.updatedAt)
+        history.push("/app/orders/orderedItemsList/?Id=" + res.data.order._id + "&&status=" + res.data.order.status + "&&supplier=" + res.data.order.supplier_id)
       })
     }
 

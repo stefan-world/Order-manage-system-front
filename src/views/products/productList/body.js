@@ -26,7 +26,8 @@ import {
   TableRow,
   TextField,
   makeStyles,
-  Checkbox
+  Checkbox,
+  Button
 } from '@material-ui/core';
 import { Edit as EditIcon } from 'react-feather';
 import Label from 'src/components/Label';
@@ -34,6 +35,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { API_BASE_URL } from 'src/config';
 import { selectOrder } from 'src/actions/checkboxAction';
 import DeleteIcon from '@material-ui/icons/Delete';
+import CSVReader from 'react-csv-reader';
 
 const statusOptions = [
   {
@@ -280,6 +282,33 @@ function Results({ className, products, deleteProduct, ...rest }) {
     event.stopPropagation();
   }
 
+  function handleFile(data, fileInfo) {
+    const batchSize = 100; // Maximum batch size
+    const productsList = data.slice(1); // Remove header row
+    let index = 0;
+    if (filter_sup.status == null) {
+      alert("Please select supplier");
+      return;
+    }
+    while (index < productsList.length) {
+      const batch = productsList.slice(index, index + batchSize);
+
+      axios.post(API_BASE_URL + 'product/importcsv', {
+        id: user._id,
+        supplier_id: filter_sup.status,
+        products_list: batch
+      })
+        .then((response) => {
+          console.log(`Batch ${index / batchSize + 1} sent successfully!`);
+        })
+        .catch((error) => {
+          console.error(`Error sending batch ${index / batchSize + 1}:`, error);
+        });
+
+      index += batchSize;
+    }
+  }
+
   return (
     <Card
       className={clsx(classes.root, className)}
@@ -355,6 +384,25 @@ function Results({ className, products, deleteProduct, ...rest }) {
             </option>
           ))}
         </TextField>
+        <Box flexGrow={1} />
+        <CSVReader
+          onFileLoaded={handleFile}
+          inputId="csv-input"
+          inputStyle={{ display: 'none' }}
+        />
+        {/* <button onClick={() => document.getElementById('csv-input').click()}>
+          Import CSV
+        </button> */}
+        <Button
+          color="secondary"
+          variant="contained"
+          className={classes.action}
+          component={RouterLink}
+          to='/app/products/productList'
+          onClick={() => document.getElementById('csv-input').click()}
+        >
+          CSV
+        </Button>
       </Box>
       <PerfectScrollbar>
         <Box minWidth={700}>
@@ -370,29 +418,50 @@ function Results({ className, products, deleteProduct, ...rest }) {
                 <TableCell>
                   Name
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   Image
+                </TableCell> */}
+                <TableCell>
+                  Brand
                 </TableCell>
-                <TableCell style={{ width: '400px' }}>
+                <TableCell>
+                  Category
+                </TableCell>
+                <TableCell>
+                  Subcategory
+                </TableCell>
+                <TableCell>
+                  Bar Code
+                </TableCell>
+                <TableCell>
+                  Purchase
+                </TableCell>
+                <TableCell>
+                  Order Quantity
+                </TableCell>
+                <TableCell>
+                  Sales Price
+                </TableCell>
+                <TableCell>
+                  Available
+                </TableCell>
+                <TableCell>
+                  Tax
+                </TableCell>
+                <TableCell>
+                  Weighable
+                </TableCell>
+                <TableCell>
+                  Show In Online
+                </TableCell>
+                <TableCell>
+                  Status
+                </TableCell>
+                <TableCell>
                   Description
                 </TableCell>
                 <TableCell>
-                  Price
-                </TableCell>
-                <TableCell>
-                  barcode
-                </TableCell>
-                <TableCell>
-                  Quantity/Box
-                </TableCell>
-                <TableCell>
-                  Ordere Quantity
-                </TableCell>
-                <TableCell>
-                  status
-                </TableCell>
-                <TableCell>
-                  Added Date
+                  Date
                 </TableCell>
                 <TableCell align="right">
                   Actions
@@ -421,25 +490,27 @@ function Results({ className, products, deleteProduct, ...rest }) {
                     <TableCell>
                       {product.name}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <Avatar
                         className={classes.avatar}
                         src={product.avatar}
                       >
                       </Avatar>
+                    </TableCell> */}
+                    <TableCell>
+                      {product.brand}
                     </TableCell>
                     <TableCell>
-                      {product.description}
+                      {product.category}
                     </TableCell>
                     <TableCell>
-                      {product.currency}
-                      {product.price}
+                      {product.subcategory}
                     </TableCell>
                     <TableCell>
                       {product.barcode}
                     </TableCell>
                     <TableCell>
-                      {product.quantity}
+                      {product.purchase}
                     </TableCell>
                     <TableCell style={{ width: '150px', alignItems: 'center' }}>
                       <TextField
@@ -449,7 +520,28 @@ function Results({ className, products, deleteProduct, ...rest }) {
                         disabled={isRowSelected === false} />
                     </TableCell>
                     <TableCell>
+                      {product.currency}
+                      {product.price}
+                    </TableCell>
+                    <TableCell>
+                      {product.available}
+                    </TableCell>
+                    <TableCell>
+                      {product.tax}
+                    </TableCell>
+
+                    <TableCell>
+                      {product.weighable}
+                    </TableCell>
+                    <TableCell>
+                      {product.showInOnline}
+                    </TableCell>
+
+                    <TableCell>
                       {getStatusLabel(product.status)}
+                    </TableCell>
+                    <TableCell>
+                      {product.description}
                     </TableCell>
                     <TableCell>
                       {moment(product.updatedAt).format('DD/MM/YYYY')}

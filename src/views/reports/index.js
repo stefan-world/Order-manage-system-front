@@ -14,7 +14,7 @@ import axios from 'src/utils/axios';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import Revenue from './revenue';
 import TotalAmount from './TotalAmount';
-import PartnersRate from './partnersRate';
+// import PartnersRate from './partnersRate';
 import SaleToday from './saleToday';
 import InvoiceList from './InvoiceList';
 import{API_BASE_URL} from 'src/config';
@@ -108,7 +108,7 @@ function DashboardView() {
           lg={6}
           sm={12}
           >
-        <PartnersRate className={classes.rate} />
+        {/* <PartnersRate className={classes.rate} /> */}
         </Grid>
         <Grid
           item

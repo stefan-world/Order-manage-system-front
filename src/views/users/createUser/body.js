@@ -1,18 +1,18 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
+import axios from 'src/utils/axios';
+import { API_BASE_URL } from "../../../config"
 import { useSnackbar } from 'notistack';
 import {
   Box,
   Button,
   TextField,
-  makeStyles
+  makeStyles,
+  MenuItem
 } from '@material-ui/core';
-import axios from 'src/utils/axios';
-import { API_BASE_URL } from 'src/config';
 
 const useStyles = makeStyles(() => ({
   root: {}
@@ -21,31 +21,36 @@ const useStyles = makeStyles(() => ({
 function RegisterForm({ className, onSubmitSuccess, ...rest }) {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useSelector((state) => state.account);
+  const [accounts, setAccounts] = useState([]);
+
+  useEffect(() => {
+    axios.post(API_BASE_URL + 'accounts/list')
+    .then((response) => {
+      setAccounts(response.data.accounts);
+    });
+  }, [])
 
   return (
     <Formik
       initialValues={{
-        name: '',
-        mobile: '',
+        username: '',
         email: '',
+        password: '',
         phone: '',
-        country: '',
-        state: '',
-        city: '',
-        postcode: '',
+        role: 'user',
         address: '',
+        status: 'active',
+        account_id: ''
       }}
       validationSchema={Yup.object().shape({
-        name: Yup.string().max(255).required('Supplier Name is required'),
-        mobile: Yup.string().max(255).required('Supplier Mobile is required'),
-        email: Yup.string().max(255).required('Supplier Email is required'),
-        phone: Yup.string().max(255).required('Supplier Phone is required'),
-        country: Yup.string().max(255).required('Supplier Country is required'),
-        state: Yup.string().max(255).required('Supplier State is required'),
-        city: Yup.string().max(255).required('Supplier City is required'),
-        postcode: Yup.string().max(255).required('Supplier Postcode is required'),
-        address: Yup.string().max(255).required('Supplier Address is required'),
+        username: Yup.string().max(255).required('User name is required'),
+        email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+        password: Yup.string().min(5).max(255).required('Password is required'),
+        phone: Yup.string().required('Phone number is required'),
+        role: Yup.string().required('Status is required'),
+        address: Yup.string().max(255).required('Address is required'),
+        status: Yup.string().max(255).required('State is required'),
+        account_id: Yup.string().max(255).required('Account is required'),
       })}
       onSubmit={async (values, {
         setErrors,
@@ -53,12 +58,10 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
         setSubmitting
       }) => {
         try {
-          // Make API request
-          const user_id = user._id;
-          const { name, mobile, email, phone, country, state, city, postcode, address } = values;
+          // Make API request     
+          const { username, email, password, phone, role, address, status, account_id } = values;
           var data = '';
-
-          await axios.post(API_BASE_URL + 'suppliers/create', { name, mobile, email, phone, country, state, city, postcode, address, user_id })
+          await axios.post(API_BASE_URL + 'signup', { username, email, password, phone, role, address, status, account_id })
             .then((response) => {
               data = response.data;
             })
@@ -75,8 +78,7 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
             });
           }
           onSubmitSuccess();
-        }
-        catch (error) {
+        } catch (error) {
           setStatus({ success: false });
           setErrors({ submit: error.message });
           setSubmitting(false);
@@ -98,57 +100,72 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
           {...rest}
         >
           <TextField
-            error={Boolean(touched.name && errors.name)}
+            error={Boolean(touched.username && errors.username)}
             fullWidth
-            helperText={touched.name && errors.name}
-            label="Supplier Name"
+            helperText={touched.username && errors.username}
+            label="User Name"
             margin="normal"
-            name="name"
+            name="username"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="string"
-            value={values.name}
-            variant="outlined"
-          />
-          <TextField
-            error={Boolean(touched.mobile && errors.mobile)}
-            fullWidth
-            helperText={touched.mobile && errors.mobile}
-            label="Mobile"
-            margin="normal"
-            name="mobile"
-            onBlur={handleBlur}
-            onChange={handleChange}
-            type="string"
-            value={values.mobile}
+            type="username"
+            value={values.username}
             variant="outlined"
           />
           <TextField
             error={Boolean(touched.email && errors.email)}
             fullWidth
             helperText={touched.email && errors.email}
-            label="Email"
+            label="Email Address"
             margin="normal"
             name="email"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="string"
+            type="email"
             value={values.email}
             variant="outlined"
           />
           <TextField
+            error={Boolean(touched.password && errors.password)}
+            fullWidth
+            helperText={touched.password && errors.password}
+            label="Password"
+            margin="normal"
+            name="password"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="password"
+            value={values.password}
+            variant="outlined"
+          />
+
+          <TextField
             error={Boolean(touched.phone && errors.phone)}
             fullWidth
             helperText={touched.phone && errors.phone}
-            label="Phone"
+            label="Phone Number"
             margin="normal"
             name="phone"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="string"
+            type="phone"
             value={values.phone}
             variant="outlined"
           />
+          <TextField
+            select
+            fullWidth
+            margin="normal"
+            name="role"
+            label="Select Role"
+            value={values.role}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            variant="outlined"
+          >
+            <MenuItem id={"user"} value={"user"}>User</MenuItem>
+            <MenuItem id={"admin"} value={"admin"}>Admin</MenuItem>
+          </TextField>
           <TextField
             error={Boolean(touched.address && errors.address)}
             fullWidth
@@ -158,62 +175,42 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
             name="address"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="string"
+            type="address"
             value={values.address}
             variant="outlined"
           />
           <TextField
-            error={Boolean(touched.city && errors.city)}
+            select
             fullWidth
-            helperText={touched.city && errors.city}
-            label="City"
             margin="normal"
-            name="city"
+            name="status"
+            label="Select status"
+            value={values.status}
             onBlur={handleBlur}
             onChange={handleChange}
-            type="string"
-            value={values.city}
             variant="outlined"
-          />
+          >
+            <MenuItem id={"active"} value={"active"}>Active</MenuItem>
+            <MenuItem id={"deactive"} value={"deactive"}>Deactive</MenuItem>
+          </TextField>
           <TextField
-            error={Boolean(touched.state && errors.state)}
+            select
             fullWidth
-            helperText={touched.state && errors.state}
-            label="State"
             margin="normal"
-            name="state"
+            name="account_id"
+            label="Select Account"
+            value={values.account_id}
             onBlur={handleBlur}
             onChange={handleChange}
-            type="string"
-            value={values.state}
             variant="outlined"
-          />
-          <TextField
-            error={Boolean(touched.postcode && errors.postcode)}
-            fullWidth
-            helperText={touched.postcode && errors.postcode}
-            label="Postcode"
-            margin="normal"
-            name="postcode"
-            onBlur={handleBlur}
-            onChange={handleChange}
-            type="string"
-            value={values.postcode}
-            variant="outlined"
-          />
-          <TextField
-            error={Boolean(touched.country && errors.country)}
-            fullWidth
-            helperText={touched.country && errors.country}
-            label="Country"
-            margin="normal"
-            name="country"
-            onBlur={handleBlur}
-            onChange={handleChange}
-            type="string"
-            value={values.country}
-            variant="outlined"
-          />
+          >
+            {accounts.map((option) => (
+              <MenuItem key={option._id} value={option._id}>
+                {option.account_name}
+              </MenuItem>
+            ))}
+          </TextField>
+
           <Box mt={2}>
             <Button
               color="secondary"
@@ -223,7 +220,7 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
               type="submit"
               variant="contained"
             >
-              Save
+              Create
             </Button>
           </Box>
         </form>

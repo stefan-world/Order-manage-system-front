@@ -32,14 +32,13 @@ function ProductsListView() {
 
   const getCustomers = useCallback(() => {
     axios
-      .get(API_BASE_URL + 'products/list/'+user._id)
+      .get(API_BASE_URL + 'product/list/'+user._id)
       .then((response) => {
         if (isMountedRef.current) {
           setProducts(response.data.products);
         }
       });
   }, [isMountedRef]);
-
   useEffect(() => {
     getCustomers();
   }, [getCustomers]);
@@ -50,7 +49,7 @@ function ProductsListView() {
 
   const onDelete = (Id) => {
     axios
-      .get(API_BASE_URL + 'products/delete/' + Id)
+      .get(API_BASE_URL + 'product/delete/' + Id)
       .then((response) => {
         if (isMountedRef.current) {
           setProducts(response.data.products);

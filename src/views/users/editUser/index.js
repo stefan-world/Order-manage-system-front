@@ -35,35 +35,35 @@ function RegisterView() {
   const classes = useStyles();
   const history = useHistory();
   const isMountedRef = useIsMountedRef();
-  const [account, setAccount] = useState(null);
+  const [user, setUser] = useState(null);
   const params = useParams();
-  const id = params.accountId;
-  const getAccounts = useCallback(() => {
+  const id = params.userId;
+  const getUsers = useCallback(() => {
     axios
-      .get(API_BASE_URL +'accounts/edit/' + id)
+      .get(API_BASE_URL +'users/edit/' + id)
       .then((response) => {
         if (isMountedRef.current) {
-          setAccount(response.data.account);
+          setUser(response.data.user);
         }
       });
   }, [isMountedRef, id]);
 
   useEffect(() => {
-    getAccounts();
-  }, [getAccounts]);
+    getUsers();
+  }, [getUsers]);
 
-  if (!account) {
+  if (!user) {
     return null;
   }
 
   const handleSubmitSuccess = () => {
-    history.push('/app/accounts/list');
+    history.push('/app/users/list');
   };
 
   return (
     <Page
       className={classes.root}
-      title="Account edit"
+      title="User edit"
     > 
        <Header />
       <Container maxWidth="sm">
@@ -74,21 +74,21 @@ function RegisterView() {
               variant="h2"
               color="textPrimary"
             >
-              Account editing page
+              User editing page
             </Typography>
             <Box mt={3}>
-              <EditForm account={account} onSubmitSuccess={handleSubmitSuccess} />
+              <EditForm user={user} onSubmitSuccess={handleSubmitSuccess} />
             </Box>
             <Box my={2}>
               <Divider />
             </Box>
             <Link
               component={RouterLink}
-              to="/app/accounts/list"
+              to="/app/users/list"
               variant="body2"
               color="textSecondary"
             >
-              go to accounts list
+              go to users list
             </Link>
           </CardContent>
         </Card>

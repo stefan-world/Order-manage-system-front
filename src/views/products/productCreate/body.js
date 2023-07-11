@@ -49,9 +49,9 @@ function ProductCreateForm({ className, ...rest }) {
 
   const getSuppliers = useCallback(() => {
     axios.get(API_BASE_URL + 'suppliers/list/' + user._id)
-    .then((response) => {
-      setSuppliers(response.data.suppliers);
-    });
+      .then((response) => {
+        setSuppliers(response.data.suppliers);
+      });
   }, [user._id]);
 
   useEffect(() => {
@@ -69,6 +69,14 @@ function ProductCreateForm({ className, ...rest }) {
         status: 'active',
         supplier: '',
         quantity: '',
+        brand: '',
+        category: '',
+        subcategory: '',
+        purchase: '',
+        available: '',
+        tax: '',
+        weighable: '',
+        showInOnline: '',
       }}
       validationSchema={Yup.object().shape({
         name: Yup.string().max(255).required('name is required'),
@@ -96,7 +104,14 @@ function ProductCreateForm({ className, ...rest }) {
                 'barcode': values.barcode,
                 'quantity': values.quantity,
                 'status': values.status,
-                'supplier': values.supplier
+                'supplier': values.supplier,
+                'brand': values.brand,
+                'category': values.category,
+                'subcategory': values.subcategory,
+                'available': values.available,
+                'tax': values.tax,
+                'weighable': values.weighable,
+                'showInOnline': values.showInOnline,
               }
             }).then(res => {
 
@@ -116,7 +131,14 @@ function ProductCreateForm({ className, ...rest }) {
               'barcode': values.barcode,
               'status': values.status,
               'quantity': values.quantity,
-              'supplier': values.supplier
+              'supplier': values.supplier,
+              'brand': values.brand,
+              'category': values.category,
+              'subcategory': values.subcategory,
+              'available': values.available,
+              'tax': values.tax,
+              'weighable': values.weighable,
+              'showInOnline': values.showInOnline,
             }).then(res => {
 
               setStatus({ success: true });
@@ -162,7 +184,6 @@ function ProductCreateForm({ className, ...rest }) {
               >
                 <Grid item xs={12} md={6}>
                   <TextField
-                    style={{ marginBottom: '20px' }}
                     error={Boolean(touched.name && errors.name)}
                     fullWidth
                     helperText={touched.name && errors.name}
@@ -177,6 +198,25 @@ function ProductCreateForm({ className, ...rest }) {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <TextField
+                    error={Boolean(touched.brand && errors.brand)}
+                    fullWidth
+                    helperText={touched.brand && errors.brand}
+                    label="Brand"
+                    name="brand"
+                    type="string"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.brand}
+                    variant="outlined"
+                  />
+                </Grid>
+              </Grid>
+              <Grid
+                container
+                spacing={3}
+              >
+                <Grid item xs={12} md={6}>
+                  <TextField
                     error={Boolean(touched.price && errors.price)}
                     fullWidth
                     helperText={(touched.price && errors.price)}
@@ -189,19 +229,120 @@ function ProductCreateForm({ className, ...rest }) {
                     variant="outlined"
                   />
                 </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    error={Boolean(touched.purchase && errors.purchase)}
+                    fullWidth
+                    helperText={(touched.purchase && errors.purchase)}
+                    label="Purchase($)"
+                    name="purchase"
+                    type="number"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.purchase}
+                    variant="outlined"
+                  />
+                </Grid>
               </Grid>
-              <TextField
-                error={Boolean(touched.description && errors.description)}
-                fullWidth
-                helperText={touched.description && errors.description}
-                label="Product's brief description"
-                name="description"
-                type="string"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.description}
-                variant="outlined"
-              />
+              <Grid
+                container
+                spacing={3}
+              >
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    error={Boolean(touched.category && errors.category)}
+                    fullWidth
+                    helperText={touched.category && errors.category}
+                    label="Category"
+                    name="category"
+                    type="string"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.category}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    error={Boolean(touched.subcategory && errors.subcategory)}
+                    fullWidth
+                    helperText={(touched.subcategory && errors.subcategory)}
+                    label="Subcategory"
+                    name="subcategory"
+                    type="string"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.subcategory}
+                    variant="outlined"
+                  />
+                </Grid>
+              </Grid>
+              <Grid
+                container
+                spacing={3}
+              >
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    error={Boolean(touched.available && errors.available)}
+                    fullWidth
+                    helperText={touched.available && errors.available}
+                    label="Available"
+                    name="available"
+                    type="string"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.available}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    error={Boolean(touched.tax && errors.tax)}
+                    fullWidth
+                    helperText={(touched.tax && errors.tax)}
+                    label="Tax"
+                    name="tax"
+                    type="string"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.tax}
+                    variant="outlined"
+                  />
+                </Grid>
+              </Grid>
+              <Grid
+                container
+                spacing={3}
+              >
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    error={Boolean(touched.weighable && errors.weighable)}
+                    fullWidth
+                    helperText={touched.weighable && errors.weighable}
+                    label="Weighable"
+                    name="weighable"
+                    type="string"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.weighable}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    error={Boolean(touched.showInOnline && errors.showInOnline)}
+                    fullWidth
+                    helperText={(touched.showInOnline && errors.showInOnline)}
+                    label="ShowInOnline"
+                    name="showInOnline"
+                    type="string"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.showInOnline}
+                    variant="outlined"
+                  />
+                </Grid>
+              </Grid>
               <Grid
                 container
                 spacing={3}
@@ -210,7 +351,6 @@ function ProductCreateForm({ className, ...rest }) {
                   <TextField
                     select
                     fullWidth
-                    margin="normal"
                     name="status"
                     label="Select Status"
                     value={values.status}
@@ -226,7 +366,6 @@ function ProductCreateForm({ className, ...rest }) {
                   <TextField
                     select
                     fullWidth
-                    margin="normal"
                     name="supplier"
                     label="Select Supplier"
                     value={values.supplier}
@@ -275,6 +414,19 @@ function ProductCreateForm({ className, ...rest }) {
                   />
                 </Grid>
               </Grid>
+              <TextField
+                error={Boolean(touched.description && errors.description)}
+                fullWidth
+                margin="normal"
+                helperText={touched.description && errors.description}
+                label="Product's brief description"
+                name="description"
+                type="string"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.description}
+                variant="outlined"
+              />
 
             </CardContent>
           </Card>

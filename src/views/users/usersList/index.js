@@ -14,50 +14,59 @@ import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import Header from './header';
 import Results from './body';
 import { API_BASE_URL } from 'src/config';
-import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: theme.palette.background.dark,
+    minHeight: '100%',
     paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(3),
+    paddingBottom: theme.spacing(3)
   }
 }));
 
-function ProductsListView() {
+function UsersListView() {
   const classes = useStyles();
   const isMountedRef = useIsMountedRef();
-  const [products, setProducts] = useState(null);
-  const { user } = useSelector((state) => state.account);
+  const [users, setUsers] = useState(null);
+  const [accounts, setAccounts] = useState([]);
 
-  const getCustomers = useCallback(() => {
+  const getUsers = useCallback(() => {
     axios
-      .get(API_BASE_URL + 'product/list/'+user._id)
+      .post(API_BASE_URL + 'users/list')
       .then((response) => {
         if (isMountedRef.current) {
-          setProducts(response.data.products);
+          setUsers(response.data.users);
         }
+      });
+    axios.post(API_BASE_URL + 'accounts/list')
+      .then((response) => {
+        setAccounts(response.data.accounts);
       });
   }, [isMountedRef]);
 
   useEffect(() => {
-    getCustomers();
-  }, [getCustomers]);
+    getUsers();
+  }, [getUsers]);
 
-  if (!products) {
-    return null;
+  const deletUser = (userId) => {
+
+    axios
+      .post(API_BASE_URL + 'users/delete/' + userId)
+      .then((response) => {
+        setUsers(response.data.users);
+      });
   }
 
   return (
     <Page
       className={classes.root}
-      title="Partners List"
+      title="Users List"
     >
       <Container maxWidth={false}>
         <Header />
-        {products && (
+        {users && (
           <Box mt={10} >
-            <Results products={products} />
+            <Results deletUser={deletUser} users={users} accounts={accounts}/>
           </Box>
         )}
       </Container>
@@ -65,4 +74,4 @@ function ProductsListView() {
   );
 }
 
-export default ProductsListView;
+export default UsersListView;

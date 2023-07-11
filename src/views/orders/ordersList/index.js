@@ -13,6 +13,7 @@ import axios from 'src/utils/axios';
 import Page from 'src/components/Page';
 import Header from './header';
 import Results from './body';
+import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { API_BASE_URL } from 'src/config';
 
 const useStyles = makeStyles((theme) => ({
@@ -24,29 +25,26 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function InvoiceListView() {
+function OrdersListView() {
   const classes = useStyles();
+  // const isMountedRef = useIsMountedRef();
   const { user } = useSelector((state) => state.account);
-  const [orders, setOrders] = useState([]);
-
-  const getOrders = useCallback(() => {
-    axios.get(API_BASE_URL + 'ordersList/list/' + user._id)
-    .then((response) => {
-      setOrders(response.data.orders);
-    });
-  }, [user._id]);
+  const [orders, setOrders] = useState(null);
 
   useEffect(() => {
-    getOrders();
-  }, [getOrders]);
+    axios.get(API_BASE_URL + 'ordersList/list/' + user._id)
+      .then((response) => {
+        setOrders(response.data.orders);
+      });
+  }, []);
 
   if (!orders) {
     return null;
   }
 
-  const ondelete =(orderId) =>{
-      axios
-      .get(API_BASE_URL + 'ordersList/delete/'+orderId)
+  const ondelete = (orderId) => {
+    axios
+      .get(API_BASE_URL + 'ordersList/delete/' + orderId)
       .then((response) => {
         setOrders(response.data.orders);
       });
@@ -59,12 +57,12 @@ function InvoiceListView() {
     >
       <Container maxWidth={false}>
         <Header />
-          <Box mt={15}>
-            <Results orders={orders} deleteOrder={ondelete}/>
-          </Box>
+        <Box mt={15}>
+          <Results orders={orders} deleteOrder={ondelete} />
+        </Box>
       </Container>
     </Page>
   );
 }
 
-export default InvoiceListView;
+export default OrdersListView;

@@ -92,9 +92,9 @@ const navConfig = [
         href: '/app/accounts/list'
       },
       {
-        title: 'Add Account',
-        icon: UserIcon,
-        href: '/app/accounts/add'
+        title: 'Users List',
+        icon: UsersIcon,
+        href: '/app/users/list'
       }
     ]
   }

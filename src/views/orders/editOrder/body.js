@@ -1,11 +1,9 @@
-/* eslint-disable max-len */
-// import React, { useState } from 'react';
+
 import React, {
   useState,
   useEffect,
   useCallback
 } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import clsx from 'clsx';
 import axios from 'src/utils/axios';
 import PropTypes from 'prop-types';
@@ -32,6 +30,7 @@ import { API_BASE_URL } from 'src/config';
 import { selectOrder } from 'src/actions/checkboxAction';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const statusOptions = [
   {
@@ -174,16 +173,19 @@ function Results({ className, products, ...rest }) {
   const [selectedRows, setSelectedRows] = useState([]);
   const [quantity, setQuantity] = useState([]);
   const dispatch = useDispatch();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  console.log(quantity)
 
   const getProducts = useCallback(() => {
-    let id = params.Id;
+    let id = searchParams.get('Id');
     axios
       .get(API_BASE_URL + 'order/list/' + id)
       .then((response) => {
         if (isMountedRef.current) {
-          console.log(response.data.itemsList)
-          setSelectedRows(response.data.itemsList.map(item=>item._id));
-          setQuantity(response.data.itemsList.map(item=>item.quantity))
+          setSelectedRows(response.data.itemsList.map(item => item._id));
+          dispatch(selectOrder(response.data.itemsList.map(item => item._id)));
+          setQuantity(response.data.itemsList.map(item => item.quantity))
         }
         setFilter_sup((prevFilters) => ({
           ...prevFilters,
@@ -196,6 +198,12 @@ function Results({ className, products, ...rest }) {
   useEffect(() => {
     getProducts();
   }, [getProducts]);
+
+  function handleQuantityChange(index, value) {
+    const newQuantity = [...quantity];
+    newQuantity[index] = value;
+    setQuantity(newQuantity);
+  }
 
   const handleStatusChange = (event) => {
     event.persist();
@@ -333,36 +341,56 @@ function Results({ className, products, ...rest }) {
                 <TableCell>
                   Name
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   Image
+                </TableCell> */}
+                <TableCell>
+                  Brand
                 </TableCell>
-                <TableCell style={{ width: '400px' }}>
+                <TableCell>
+                  Category
+                </TableCell>
+                <TableCell>
+                  Subcategory
+                </TableCell>
+                <TableCell>
+                  Bar Code
+                </TableCell>
+                <TableCell>
+                  Purchase
+                </TableCell>
+                <TableCell>
+                  Order Quantity
+                </TableCell>
+                <TableCell>
+                  Sales Price
+                </TableCell>
+                <TableCell>
+                  Available
+                </TableCell>
+                <TableCell>
+                  Tax
+                </TableCell>
+                <TableCell>
+                  Weighable
+                </TableCell>
+                <TableCell>
+                  Show In Online
+                </TableCell>
+                <TableCell>
+                  Status
+                </TableCell>
+                <TableCell>
                   Description
                 </TableCell>
-                <TableCell>
-                  Price
-                </TableCell>
-                <TableCell>
-                  barcode
-                </TableCell>
-                <TableCell>
-                  Quantity/Box
-                </TableCell>
-                <TableCell>
-                  Ordere Quantity
-                </TableCell>
-                <TableCell>
-                  status
-                </TableCell>
-                <TableCell>
-                  Added Date
+                <TableCell align="right">
+                  Date
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {paginatedProducts.map((product) => {
                 const isRowSelected = selectedRows.indexOf(product._id) !== -1;
-                console.log(quantity[selectedRows.indexOf(product._id)]);
                 const isRowDisabled = product.status;
                 return (
                   <TableRow
@@ -382,36 +410,60 @@ function Results({ className, products, ...rest }) {
                     <TableCell>
                       {product.name}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <Avatar
                         className={classes.avatar}
                         src={product.avatar}
                       >
                       </Avatar>
+                    </TableCell> */}
+                    <TableCell>
+                      {product.brand}
                     </TableCell>
                     <TableCell>
-                      {product.description}
+                      {product.category}
+                    </TableCell>
+                    <TableCell>
+                      {product.subcategory}
+                    </TableCell>
+                    <TableCell>
+                      {product.barcode}
+                    </TableCell>
+                    <TableCell>
+                      {product.purchase}
+                    </TableCell>
+                    <TableCell style={{ width: '150px', alignItems: 'center' }}>
+                      <TextField
+                        onChange={(event) => handleQuantityChange(selectedRows.indexOf(product._id), event.target.value)}
+                        onClick={handleEnterQuantity}
+                        type="number"
+                        name={product._id + "-quantity"}
+                        value={quantity[selectedRows.indexOf(product._id)] || ""}
+                        disabled={isRowSelected === false} />
                     </TableCell>
                     <TableCell>
                       {product.currency}
                       {product.price}
                     </TableCell>
                     <TableCell>
-                      {product.barcode}
+                      {product.available}
                     </TableCell>
                     <TableCell>
-                      {product.quantity}
+                      {product.tax}
                     </TableCell>
-                    <TableCell style={{ width: '150px', alignItems: 'center' }}>
-                      <TextField
-                        onClick={handleEnterQuantity}
-                        type="number"
-                        name={product._id + "-quantity"}
-                        value={quantity[selectedRows.indexOf(product._id)]}
-                        disabled={isRowSelected === false} />
+
+                    <TableCell>
+                      {product.weighable}
                     </TableCell>
+                    <TableCell>
+                      {product.showInOnline}
+                    </TableCell>
+
                     <TableCell>
                       {getStatusLabel(product.status)}
+                    </TableCell>
+                    <TableCell>
+                      {product.description}
                     </TableCell>
                     <TableCell>
                       {moment(product.updatedAt).format('DD/MM/YYYY')}

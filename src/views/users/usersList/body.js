@@ -36,8 +36,8 @@ const sortOptions = [
   },
 ];
 
-function applyPagination(accounts, page, limit) {
-  return accounts.slice(page * limit, page * limit + limit);
+function applyPagination(users, page, limit) {
+  return users.slice(page * limit, page * limit + limit);
 }
 
 function descendingComparator(a, b, orderBy) {
@@ -58,10 +58,10 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-function applySort(accounts, sort) {
+function applySort(users, sort) {
   const [orderBy, order] = sort.split('|');
   const comparator = getComparator(order, orderBy);
-  const stabilizedThis = accounts.map((el, index) => [el, index]);
+  const stabilizedThis = users.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
     // eslint-disable-next-line no-shadow
@@ -105,12 +105,34 @@ function getStatusLabel(inventoryType) {
   );
 }
 
-function Results({ className, accounts, deletAccount, ...rest }) {
+function applySupplyFilters(items, filters) {
+  return items.filter((item) => {
+    let matches = true;
+
+    if (filters.status && item.account_id !== filters.status) {
+      matches = false;
+    }
+
+    return matches;
+  });
+}
+
+function Results({ className, users, accounts, deletUser, ...rest }) {
   const classes = useStyles();
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [sort, setSort] = useState(sortOptions[0].value);
+  const [filter_sup, setFilter_sup] = useState({ status: null });
 
+  const accountsOptions = accounts
+    .map((el) => {
+      if (el.status === "active") {
+        return { id: el._id, name: el.account_name };
+      }
+      return null;
+    })
+    .filter((option) => option !== null);
+  accountsOptions.unshift({ id: "all", name: "All" })
 
   const handleSortChange = (event) => {
     event.persist();
@@ -125,8 +147,22 @@ function Results({ className, accounts, deletAccount, ...rest }) {
     setLimit(event.target.value);
   };
 
-  const sortedAccounts = applySort(accounts, sort);
-  const paginatedAccounts = applyPagination(sortedAccounts, page, limit);
+  const handleAccountChange = (event) => {
+    event.persist();
+
+    let value = null;
+
+    if (event.target.value !== 'all') {
+      value = event.target.value;
+    }
+    setFilter_sup((prevFilters) => ({
+      ...prevFilters,
+      status: value
+    }));
+  };
+  const FilteredUsers = applySupplyFilters(users, filter_sup);
+  const sortedUsers = applySort(FilteredUsers, sort);
+  const paginatedUsers = applyPagination(sortedUsers, page, limit);
 
   return (
     <Card
@@ -140,6 +176,25 @@ function Results({ className, accounts, deletAccount, ...rest }) {
         display="flex"
         alignItems="center"
       >
+        <TextField
+          label="Accounts"
+          name="account"
+          onChange={handleAccountChange}
+          select
+          SelectProps={{ native: true }}
+          value={filter_sup.status || 'all'}
+          variant="outlined"
+        >
+          {accountsOptions.map((option) => (
+            <option
+              key={option.id}
+              value={option.id}
+            >
+              {option.name}
+            </option>
+          ))}
+        </TextField>
+        <Box flexGrow={1} />
         <TextField
           label="Sort By"
           name="sort"
@@ -165,43 +220,22 @@ function Results({ className, accounts, deletAccount, ...rest }) {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  ID
-                </TableCell>
-                <TableCell style={{minWidth: '150px'}}>
-                  Account Name
-                </TableCell>
-                <TableCell style={{minWidth: '160px'}}>
-                  Primary First Name
-                </TableCell>
-                <TableCell style={{minWidth: '160px'}}>
-                  Primary Last Name
-                </TableCell>
-                <TableCell style={{minWidth: '150px'}}>
-                  Primary mobile
-                </TableCell>
-                <TableCell style={{minWidth: '150px'}}>
-                  Address Line 1
-                </TableCell>
-                <TableCell style={{minWidth: '150px'}}>
-                  Address Line 2
+                  No
                 </TableCell>
                 <TableCell>
-                  City
+                  User Name
                 </TableCell>
                 <TableCell>
-                  State
+                  Email
                 </TableCell>
                 <TableCell>
-                  State
+                  Phone
                 </TableCell>
                 <TableCell>
-                  Postcode
+                  Address
                 </TableCell>
                 <TableCell>
-                  Country
-                </TableCell>
-                <TableCell>
-                  Company Email
+                  Role
                 </TableCell>
                 <TableCell>
                   Status
@@ -212,67 +246,63 @@ function Results({ className, accounts, deletAccount, ...rest }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedAccounts.map((account) => {
+              {paginatedUsers.map((user, key) => {
 
                 return (
                   <TableRow
                     hover
-                    key={account._id}
+                    key={user._id}
                   >
                     <TableCell>
-                      {account.number}
+                      {user.number}
                     </TableCell>
                     <TableCell>
-                      {account.account_name}
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                      >
+                        <Avatar
+                          className={classes.avatar}
+                          src={user.avatar}
+                        >
+                        </Avatar>
+                        <div>
+                          <Link
+                            color="inherit"
+                            variant="h6"
+                          >
+                            {user.username}
+                          </Link>
+                        </div>
+                      </Box>
                     </TableCell>
                     <TableCell>
-                      {account.primary_contact_firstname}
+                      {user.email}
                     </TableCell>
                     <TableCell>
-                      {account.primary_contact_lastname}
+                      {user.phone}
                     </TableCell>
                     <TableCell>
-                      {account.primary_contact_mobile}
+                      {user.address}
                     </TableCell>
                     <TableCell>
-                      {account.primary_contact_email}
+                      {user.role}
                     </TableCell>
                     <TableCell>
-                      {account.address_line1}
-                    </TableCell>
-                    <TableCell>
-                      {account.address_line2}
-                    </TableCell>
-                    <TableCell>
-                      {account.city}
-                    </TableCell>
-                    <TableCell>
-                      {account.state}
-                    </TableCell>
-                    <TableCell>
-                      {account.postcode}
-                    </TableCell>
-                    <TableCell>
-                      {account.country}
-                    </TableCell>
-                    <TableCell>
-                      {account.company_eamil}
-                    </TableCell>
-                    <TableCell>
-                    {getStatusLabel(account.status)}
+                      {getStatusLabel(user.status)}
                     </TableCell>
                     <TableCell align="right">
                       <IconButton
                         component={RouterLink}
-                        to={"/app/accounts/edit/" + account._id}
+                        to={"/app/users/edit/" + user._id}
                       >
                         <SvgIcon fontSize="small">
                           <EditIcon />
                         </SvgIcon>
                       </IconButton>
-                      {(account.role !== "admin") &&
+                      {(user.role !== "admin") &&
                         <IconButton
-                          onClick={() => { if (window.confirm('Are you really want to delete?')) deletAccount(account._id) }}
+                          onClick={() => { if (window.confirm('Are you really want to delete?')) deletUser(user._id) }}
                         >
                           <SvgIcon fontSize="small">
                             <DeleteIcon />
@@ -289,7 +319,7 @@ function Results({ className, accounts, deletAccount, ...rest }) {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={accounts.length}
+        count={users.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -302,11 +332,11 @@ function Results({ className, accounts, deletAccount, ...rest }) {
 
 Results.propTypes = {
   className: PropTypes.string,
-  accounts: PropTypes.array
+  users: PropTypes.array
 };
 
 Results.defaultProps = {
-  accounts: []
+  users: []
 };
 
 export default Results;

@@ -91,7 +91,7 @@ const routesConfig = [
       },
       {
         exact: true,
-        path: '/app/orders/editOrder/:Id',
+        path: '/app/orders/editOrder/',
         component: lazy(() => import('src/views/orders/editOrder'))
       },
       {
@@ -111,6 +111,24 @@ const routesConfig = [
         guard: adminGuard,
         path: '/app/accounts/edit/:accountId',
         component: lazy(() => import('src/views/accounts/editAccount'))
+      },
+      {
+        exact: true,
+        guard: adminGuard,
+        path: '/app/users/list',
+        component: lazy(() => import('src/views/users/usersList'))
+      },
+      {
+        exact: true,
+        guard: adminGuard,
+        path: '/app/users/add',
+        component: lazy(() => import('src/views/users/createUser'))
+      },
+      {
+        exact: true,
+        guard: adminGuard,
+        path: '/app/users/edit/:userId',
+        component: lazy(() => import('src/views/users/editUser'))
       },
       {
         component:() => <Redirect to='/404' />

@@ -103,8 +103,7 @@ function Results({ className, ...rest }) {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [sort, setSort] = useState(sortOptions[0].value);
-  const isMountedRef = useIsMountedRef();
-  const [itemsList, setItemsList] = useState(null);
+  const [itemslit, setItemslist] = useState(null);
   const [status, setStatus] = useState();
   const { user } = useSelector((state) => state.account);
   const [supplier, setSupplier] = useState(null);
@@ -112,22 +111,22 @@ function Results({ className, ...rest }) {
 
   useEffect(() => {
     let id = searchParams.get('Id');
+    let account
     let supplier_id = searchParams.get('supplier');
     axios
     .get(API_BASE_URL + 'order/list/' + id)
     .then((response) => {
-        setItemsList(response.data.itemsList);
+      setItemslist(response.data.itemsList);
     });
     setStatus(searchParams.get('status'));
   axios
     .post(API_BASE_URL + 'suppliers/edit', { id: supplier_id })
     .then((response) => {
-      console.log(response.data.supplier)
       setSupplier(response.data.supplier);
     });
   }, []);
 
-  if (!itemsList) {
+  if (!itemslit) {
     return null;
   }
 
@@ -170,10 +169,10 @@ function Results({ className, ...rest }) {
     setLimit(event.target.value);
   };
 
-  const sortedProducts = applySort(itemsList, sort);
+  const sortedProducts = applySort(itemslit, sort);
   const paginatedProducts = applyPagination(sortedProducts, page, limit);
 
-  const pdfComponant = (<div ref={tableRef} id="pdfComponant" style={{ width: '793px', height: '1122px', display: 'block', fontFamily: 'helvetica', fontSize: '12pt', color: 'black', padding: '20px' }}>
+  const pdfComponant = (<div ref={tableRef} id="pdfComponant" style={{ width: '793px', height: '1122px', display: 'none', fontFamily: 'helvetica', fontSize: '12pt', color: 'black', padding: '20px' }}>
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div>
         <h2 style={{ margin: '10px' }}>{user.username}</h2>
@@ -181,8 +180,8 @@ function Results({ className, ...rest }) {
       </div>
       <div>
         <h1>PURCHASE ORDER</h1>
-        <h4 style={{ margin: '20px', float: 'right' }}>{'PO: #' + itemsList[0].number}</h4>
-        <h4 style={{ margin: '20px', float: 'right' }}>{moment(itemsList[0].updatedAt).format('DD/MM/YYYY')}</h4>
+        <h4 style={{ margin: '20px', float: 'right' }}>{'PO: #' + itemslit[0].number}</h4>
+        <h4 style={{ margin: '20px', float: 'right' }}>{moment(itemslit[0].updatedAt).format('DD/MM/YYYY')}</h4>
       </div>
     </div>
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -217,7 +216,7 @@ function Results({ className, ...rest }) {
       <tbody>
         {paginatedProducts.map((product) => {
           return (
-            <tr>
+            <tr key={product._id}>
               <td style={{ border: '1px solid #19264d', padding: '8px' }}>
                 {product.number}
               </td>
@@ -364,7 +363,7 @@ function Results({ className, ...rest }) {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={itemsList.length}
+        count={itemslit.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -378,11 +377,11 @@ function Results({ className, ...rest }) {
 
 Results.propTypes = {
   className: PropTypes.string,
-  itemsList: PropTypes.array
+  itemslit: PropTypes.array
 };
 
 Results.defaultProps = {
-  itemsList: []
+  itemslit: []
 };
 
 export default Results;

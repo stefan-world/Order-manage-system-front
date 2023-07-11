@@ -25,20 +25,34 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
   return (
     <Formik
       initialValues={{
-        username: '',
-        email: '',
-        password: '',
-        phone: '',
-        role: 'user',
-        address: '',
+        account_name: '',
+        primary_contact_firstname: '',
+        primary_contact_lastname: '',
+        primary_contact_mobile: '',
+        primary_contact_email: '',
+        address_line1: '',
+        address_line2: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: '',
+        company_eamil: '',
+        status: "active"
       }}
       validationSchema={Yup.object().shape({
-        username: Yup.string().max(255).required('User name is required'),
-        email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-        password: Yup.string().min(5).max(255).required('Password is required'),
-        phone: Yup.string().required('Phone number is required'),
-        role: Yup.string().required('Status is required'),
-        address: Yup.string().max(255).required('Address is required'),
+        account_name: Yup.string().max(255).required('Account name is required'),
+        primary_contact_firstname: Yup.string().max(255).required('Primary Contact First Name is required'),
+        primary_contact_lastname: Yup.string().max(255).required('Primary Contact Last Name is required'),
+        primary_contact_mobile: Yup.string().max(255).required('Primary Contact Mobile is required'),
+        primary_contact_email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+        address_line1: Yup.string().max(255).required('Primary Contact First Name is required'),
+        address_line2: Yup.string().max(255).required('Primary Contact Last Name is required'),
+        city: Yup.string().max(255).required('Primary Contact Mobile is required'),
+        state: Yup.string().max(255).required('Primary Contact Email is required'),
+        postcode: Yup.string().max(255).required('Primary Contact First Name is required'),
+        country: Yup.string().max(255).required('Primary Contact Last Name is required'),
+        company_eamil: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+        status: Yup.string().max(255).required('Primary Contact Email is required'),
       })}
       onSubmit={async (values, {
         setErrors,
@@ -47,11 +61,14 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
       }) => {
         try {
           // Make API request     
-          const { username, email, password, phone, role, address } = values;
+          const { account_name, primary_contact_firstname, primary_contact_lastname, primary_contact_mobile, primary_contact_email,
+            address_line1, address_line2, city, state, postcode, country, company_eamil, status } = values;
           var data = '';
 
-          await axios.post(API_BASE_URL + 'signup', { username, email, password, phone, role, address })
-            .then((response) => {
+          await axios.post(API_BASE_URL + 'accounts/create', {
+            account_name, primary_contact_firstname, primary_contact_lastname, primary_contact_mobile, 
+            primary_contact_email, address_line1, address_line2, city, state, postcode, country, company_eamil, status
+          }).then((response) => {
               data = response.data;
             })
           if (data.success) {
@@ -89,85 +106,175 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
           {...rest}
         >
           <TextField
-            error={Boolean(touched.username && errors.username)}
+            error={Boolean(touched.account_name && errors.account_name)}
             fullWidth
-            helperText={touched.username && errors.username}
-            label="User Name"
+            helperText={touched.account_name && errors.account_name}
+            label="Name"
             margin="normal"
-            name="username"
+            name="account_name"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="username"
-            value={values.username}
+            type="account_name"
+            value={values.account_name}
             variant="outlined"
           />
           <TextField
-            error={Boolean(touched.email && errors.email)}
+            error={Boolean(touched.primary_contact_firstname && errors.primary_contact_firstname)}
             fullWidth
-            helperText={touched.email && errors.email}
-            label="Email Address"
+            helperText={touched.primary_contact_firstname && errors.primary_contact_firstname}
+            label="Primary Contact First Name"
             margin="normal"
-            name="email"
+            name="primary_contact_firstname"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="email"
-            value={values.email}
+            type="primary_contact_firstname"
+            value={values.primary_contact_firstname}
             variant="outlined"
           />
           <TextField
-            error={Boolean(touched.password && errors.password)}
+            error={Boolean(touched.primary_contact_lastname && errors.primary_contact_lastname)}
             fullWidth
-            helperText={touched.password && errors.password}
-            label="Password"
+            helperText={touched.primary_contact_lastname && errors.primary_contact_lastname}
+            label="Primary Contact Last Name"
             margin="normal"
-            name="password"
+            name="primary_contact_lastname"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="password"
-            value={values.password}
+            type="primary_contact_lastname"
+            value={values.primary_contact_lastname}
             variant="outlined"
           />
-
           <TextField
-            error={Boolean(touched.phone && errors.phone)}
+            error={Boolean(touched.primary_contact_mobile && errors.primary_contact_mobile)}
             fullWidth
-            helperText={touched.phone && errors.phone}
-            label="Phone Number"
+            helperText={touched.primary_contact_mobile && errors.primary_contact_mobile}
+            label="Primary Contact Mobile"
             margin="normal"
-            name="phone"
+            name="primary_contact_mobile"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="phone"
-            value={values.phone}
+            type="primary_contact_mobile"
+            value={values.primary_contact_mobile}
+            variant="outlined"
+          />
+          <TextField
+            error={Boolean(touched.primary_contact_email && errors.primary_contact_email)}
+            fullWidth
+            helperText={touched.primary_contact_email && errors.primary_contact_email}
+            label="Primary Contact Email"
+            margin="normal"
+            name="primary_contact_email"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="primary_contact_email"
+            value={values.primary_contact_email}
+            variant="outlined"
+          />
+          <TextField
+            error={Boolean(touched.address_line1 && errors.address_line1)}
+            fullWidth
+            helperText={touched.address_line1 && errors.address_line1}
+            label="Address Line 1"
+            margin="normal"
+            name="address_line1"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="address_line1"
+            value={values.address_line1}
+            variant="outlined"
+          />
+          <TextField
+            error={Boolean(touched.address_line2 && errors.address_line2)}
+            fullWidth
+            helperText={touched.address_line2 && errors.address_line2}
+            label="Address Line 2"
+            margin="normal"
+            name="address_line2"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="address_line2"
+            value={values.address_line2}
+            variant="outlined"
+          />
+          <TextField
+            error={Boolean(touched.city && errors.city)}
+            fullWidth
+            helperText={touched.city && errors.city}
+            label="City"
+            margin="normal"
+            name="city"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="city"
+            value={values.city}
+            variant="outlined"
+          />
+          <TextField
+            error={Boolean(touched.state && errors.state)}
+            fullWidth
+            helperText={touched.state && errors.state}
+            label="State"
+            margin="normal"
+            name="state"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="state"
+            value={values.state}
+            variant="outlined"
+          />
+          <TextField
+            error={Boolean(touched.postcode && errors.postcode)}
+            fullWidth
+            helperText={touched.postcode && errors.postcode}
+            label="Postcode"
+            margin="normal"
+            name="postcode"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="postcode"
+            value={values.postcode}
+            variant="outlined"
+          />
+          <TextField
+            error={Boolean(touched.country && errors.country)}
+            fullWidth
+            helperText={touched.country && errors.country}
+            label="Country"
+            margin="normal"
+            name="country"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="country"
+            value={values.country}
+            variant="outlined"
+          />
+          <TextField
+            error={Boolean(touched.company_eamil && errors.company_eamil)}
+            fullWidth
+            helperText={touched.company_eamil && errors.company_eamil}
+            label="Company Email"
+            margin="normal"
+            name="company_eamil"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="company_eamil"
+            value={values.company_eamil}
             variant="outlined"
           />
           <TextField
             select
             fullWidth
             margin="normal"
-            name="role"
-            label="Select Role"
-            value={values.role}
+            name="status"
+            label="Status"
+            value={values.status}
             onBlur={handleBlur}
             onChange={handleChange}
             variant="outlined"
           >
-            <MenuItem id={"user"} value={"user"}>User</MenuItem>
-            <MenuItem id={"admin"} value={"admin"}>Admin</MenuItem>
+            <MenuItem id={"active"} value={"active"}>Active</MenuItem>
+            <MenuItem id={"deactive"} value={"deactive"}>Deactive</MenuItem>
           </TextField>
-          <TextField
-            error={Boolean(touched.address && errors.address)}
-            fullWidth
-            helperText={touched.address && errors.address}
-            label="Address"
-            margin="normal"
-            name="address"
-            onBlur={handleBlur}
-            onChange={handleChange}
-            type="address"
-            value={values.address}
-            variant="outlined"
-          />
 
           <Box mt={2}>
             <Button

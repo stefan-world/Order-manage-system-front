@@ -73,6 +73,7 @@
     "react-beautiful-dnd": "^13.0.0",
     "react-big-calendar": "^0.24.1",
     "react-chartjs-2": "^2.9.0",
+    "react-csv-reader": "^4.0.0",
     "react-dom": "^16.13.1",
     "react-draft-wysiwyg": "^1.14.4",
     "react-dropzone": "^10.2.2",

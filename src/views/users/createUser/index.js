@@ -1,12 +1,6 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback
-} from 'react';
-import { Link as RouterLink, useParams } from 'react-router-dom';
+import React from 'react';
+import { Link as RouterLink} from 'react-router-dom';
 import { useHistory } from 'react-router';
-import axios from 'src/utils/axios';
-import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import {
   Box,
   Card,
@@ -18,9 +12,8 @@ import {
   makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
-import EditForm from './body';
+import RegisterForm from './body';
 import Header from './header';
-import { API_BASE_URL } from 'src/config';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,36 +27,16 @@ const useStyles = makeStyles((theme) => ({
 function RegisterView() {
   const classes = useStyles();
   const history = useHistory();
-  const isMountedRef = useIsMountedRef();
-  const [account, setAccount] = useState(null);
-  const params = useParams();
-  const id = params.accountId;
-  const getAccounts = useCallback(() => {
-    axios
-      .get(API_BASE_URL +'accounts/edit/' + id)
-      .then((response) => {
-        if (isMountedRef.current) {
-          setAccount(response.data.account);
-        }
-      });
-  }, [isMountedRef, id]);
 
-  useEffect(() => {
-    getAccounts();
-  }, [getAccounts]);
-
-  if (!account) {
-    return null;
-  }
 
   const handleSubmitSuccess = () => {
-    history.push('/app/accounts/list');
+    history.push('/app/users/list');
   };
 
   return (
     <Page
       className={classes.root}
-      title="Account edit"
+      title="Users creating"
     > 
        <Header />
       <Container maxWidth="sm">
@@ -74,21 +47,21 @@ function RegisterView() {
               variant="h2"
               color="textPrimary"
             >
-              Account editing page
+              User creating page
             </Typography>
             <Box mt={3}>
-              <EditForm account={account} onSubmitSuccess={handleSubmitSuccess} />
+              <RegisterForm onSubmitSuccess={handleSubmitSuccess} />
             </Box>
             <Box my={2}>
               <Divider />
             </Box>
             <Link
               component={RouterLink}
-              to="/app/accounts/list"
+              to="/app/users/list"
               variant="body2"
               color="textSecondary"
             >
-              go to accounts list
+              go to Users list
             </Link>
           </CardContent>
         </Card>

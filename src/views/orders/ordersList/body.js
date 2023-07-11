@@ -48,7 +48,8 @@ function getStatusLabel(inventoryType) {
     },
   };
 
-  const { text, color } = map[inventoryType];
+  const text = inventoryType && map[inventoryType].text;
+  const color = inventoryType && map[inventoryType].color;
   return (
     <Label color={color}>
       {text}
@@ -180,7 +181,7 @@ function Results({ className, orders, deleteOrder, ...rest }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedOrders.map((order) => {
+              { paginatedOrders.map((order) => {
                 return (
                   <TableRow
                     hover
@@ -212,8 +213,8 @@ function Results({ className, orders, deleteOrder, ...rest }) {
                       </IconButton>
                       <IconButton
                         onClick={(event) => { if (window.confirm('Are you really want to delete?')) { deleteOrder(order._id); event.stopPropagation(); } }}
-                        // component={RouterLink}
-                        // to={"/app/orders/ordersList"}
+                        component={RouterLink}
+                        to={"/app/orders/ordersList"}
                       >
                         <SvgIcon fontSize="small">
                           <DeleteIcon />
