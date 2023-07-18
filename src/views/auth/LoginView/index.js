@@ -116,7 +116,7 @@ function LoginView() {
               variant="subtitle1"
               color="textSecondary"
             >
-              Sign in on the internal platform
+              Sign in on the Order Managing System
             </Typography>
             {/* <Box mt={2}>
               <Alert

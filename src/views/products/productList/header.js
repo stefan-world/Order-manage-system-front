@@ -38,29 +38,30 @@ const useStyles = makeStyles((theme) => ({
 function Header({ className, ...rest }) {
   const classes = useStyles();
   const { user } = useSelector((state) => state.account);
-  const dispatch = useDispatch();
+  const { quantity } = useSelector((state) => state.quantity);
+  const dispatch = useDispatch(); 
   const { checkedRows } = useSelector((state) => state.selectedRows);
   const history = useHistory();
   let quantityFlag = false;
-
   const orderProducts = (id) => {
-    const quantity = checkedRows.map((product_id) => {
-      const productQT = document.getElementsByName(product_id + "-quantity")[0].value;
-      if (productQT == '')
+    const check_quantity = checkedRows.map((product_id) => {
+      const single_quantity = quantity.find(item => item[product_id] !== undefined);
+      if (single_quantity === undefined)
         quantityFlag = true;
-      return productQT;
+      else
+        return single_quantity[product_id];
     })
-
+  
     if (quantityFlag) {
       alert("Please Enther Order Quantity !");
     } else {
       dispatch(selectOrder([]));
       axios.post(API_BASE_URL + 'ordersList/create/', {
         'products_id': checkedRows,
-        'products_quantity': quantity,
+        'products_quantity': check_quantity,
         'user_id': id,
       }).then(res => {
-        history.push("/app/orders/orderedItemsList/?Id=" + res.data.order._id + "&status=" + res.data.order.status + "&supplier=" + res.data.order.supplier_id)
+        history.push("/app/orders/orderedItemsList/?Id=" + res.data.order._id + "&status=" + res.data.order.status + "&supplier=" + res.data.order.supplier_id + "&supplier=" + res.data.order.supplier_id + "&date=" + res.data.order.updatedAt)
       })
     }
 

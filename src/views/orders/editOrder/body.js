@@ -31,6 +31,7 @@ import { selectOrder } from 'src/actions/checkboxAction';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { saveQuantity } from 'src/actions/quantityAction';
 
 const statusOptions = [
   {
@@ -128,6 +129,15 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
+function applyCheckFilters(items, rows, isChecked) {
+  return items.filter(item => {
+    if(!isChecked)
+      return item
+    if (rows?.indexOf(item._id) !== -1)
+      return item._id; 
+  });
+}
+
 function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
@@ -175,7 +185,7 @@ function Results({ className, products, ...rest }) {
   const dispatch = useDispatch();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  console.log(quantity)
+  const [checked_filter, setChecked_filter] = useState(false);
 
   const getProducts = useCallback(() => {
     let id = searchParams.get('Id');
@@ -185,7 +195,7 @@ function Results({ className, products, ...rest }) {
         if (isMountedRef.current) {
           setSelectedRows(response.data.itemsList.map(item => item._id));
           dispatch(selectOrder(response.data.itemsList.map(item => item._id)));
-          setQuantity(response.data.itemsList.map(item => item.quantity))
+          setQuantity(response.data.itemsList.map(item => ({[item._id]: item.quantity})));
         }
         setFilter_sup((prevFilters) => ({
           ...prevFilters,
@@ -239,9 +249,11 @@ function Results({ className, products, ...rest }) {
 
   const filteredProducts = applyFilters(products, filters);
   const supplierFilteredProducts = applySupplyFilters(filteredProducts, filter_sup);
-  const searchedProducts = supplierFilteredProducts.filter(item =>
+  const checkedProducts = applyCheckFilters(supplierFilteredProducts, selectedRows, checked_filter);
+  const searchedProducts = checkedProducts.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   const sortedProducts = applySort(searchedProducts, sort);
   const paginatedProducts = applyPagination(sortedProducts, page, limit);
 
@@ -266,8 +278,31 @@ function Results({ className, products, ...rest }) {
     dispatch(selectOrder(newSelectedRows));
   };
 
+  const handleQuantityChan = (e, id) => {
+    const index = quantity.findIndex(item => item[id] !== undefined);
+    
+    if (index === -1) {
+      setQuantity([...quantity, {[id]: e.target.value}]);
+    } else {
+      const updatedQuantity = quantity.map(item => {
+        if (item[id] !== undefined) {
+          return {[id]: e.target.value};
+        } else {
+          return item;
+        }
+      });
+      setQuantity(updatedQuantity);
+    }
+    
+  }
+  dispatch(saveQuantity(quantity));
+
   const handleEnterQuantity = (event) => {
     event.stopPropagation();
+  }
+
+  function change_filter(){
+    setChecked_filter(!checked_filter);
   }
 
   return (
@@ -333,7 +368,7 @@ function Results({ className, products, ...rest }) {
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
-                  <Checkbox />
+                  <Checkbox checked={checked_filter} onClick={change_filter}/>
                 </TableCell>
                 <TableCell>
                   ID
@@ -434,11 +469,13 @@ function Results({ className, products, ...rest }) {
                     </TableCell>
                     <TableCell style={{ width: '150px', alignItems: 'center' }}>
                       <TextField
-                        onChange={(event) => handleQuantityChange(selectedRows.indexOf(product._id), event.target.value)}
+                        onChange={(e) => handleQuantityChan(e, product._id)}
                         onClick={handleEnterQuantity}
                         type="number"
                         name={product._id + "-quantity"}
-                        value={quantity[selectedRows.indexOf(product._id)] || ""}
+                        value={                          
+                          quantity.find(item => item[product._id]!==undefined) ? quantity.find(item => item[product._id]!==undefined)[product._id] : ''
+                        }
                         disabled={isRowSelected === false} />
                     </TableCell>
                     <TableCell>

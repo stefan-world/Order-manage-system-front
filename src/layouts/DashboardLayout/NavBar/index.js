@@ -28,7 +28,7 @@ import {
 import Logo from 'src/components/Logo';
 import NavItem from './NavItem';
 
-const navConfig = [
+const superNavConfig = [
   {
     subheader: 'Reports',
     items: [
@@ -91,6 +91,73 @@ const navConfig = [
         icon: UsersIcon,
         href: '/app/accounts/list'
       },
+      {
+        title: 'Users List',
+        icon: UsersIcon,
+        href: '/app/users/list'
+      }
+    ]
+  }
+];
+
+const navConfig = [
+  {
+    subheader: 'Reports',
+    items: [
+      {
+        title: 'Dashboard',
+        icon: PieChartIcon,
+        href: '/app/reports/dashboard'
+      }
+    ]
+  },
+
+  {
+    subheader: 'Suppliers',
+    items: [
+      {
+        title: 'Suppliers List',
+        icon: ReceiptIcon,
+        href: '/app/suppliers/supplierReport'
+      },
+      {
+        title: 'Creat Supplier',
+        icon: EditIcon,
+        href: '/app/suppliers/supplierRecord'
+      }
+    ]
+  },
+
+  {
+    subheader: 'Products',
+    items: [
+      {
+        title: 'Products List',
+        icon: ShoppingCartIcon,
+        href: '/app/products/productList'
+      },
+      {
+        title: 'Create Product',
+        icon: EditIcon,
+        href: '/app/products/productCreate'
+      }
+    ]
+  },
+
+  {
+    subheader: 'Orders',
+    items: [
+      {
+        title: 'Orders List',
+        icon: ShoppingCartIcon,
+        href: '/app/orders/ordersList'
+      },
+    ]
+  },
+
+  {
+    subheader: 'Users',
+    items: [
       {
         title: 'Users List',
         icon: UsersIcon,
@@ -285,7 +352,26 @@ function NavBar({ openMobile, onMobileClose, }) {
           </Box>
         </Box>
         <Divider />
-       { (user.role === "admin") &&
+       { (user.role === "super_admin") &&
+        <Box p={2}>
+          {superNavConfig.map((config) => (
+            <List
+              key={config.subheader}
+              subheader={(
+                <ListSubheader
+                  disableGutters
+                  disableSticky
+                >
+                  {config.subheader}
+                </ListSubheader>
+              )}
+            >
+              {renderNavItems({ items: config.items, pathname: location.pathname })}
+            </List>
+          ))}
+        </Box>
+        }       
+        { (user.role === "admin") &&
         <Box p={2}>
           {navConfig.map((config) => (
             <List
@@ -304,7 +390,7 @@ function NavBar({ openMobile, onMobileClose, }) {
           ))}
         </Box>
         }
-       { (user.role !== "admin") &&
+       { (user.role == 'user' ) &&
         <Box p={2}>
           {navConfigAccount.map((config) => (
             <List

@@ -107,23 +107,29 @@ function Results({ className, ...rest }) {
   const [status, setStatus] = useState();
   const { user } = useSelector((state) => state.account);
   const [supplier, setSupplier] = useState(null);
+  const [account, setAccount] = useState(null);
   const searchParams = new URLSearchParams(location.search);
+  const order_date = searchParams.get('date');
 
   useEffect(() => {
     let id = searchParams.get('Id');
-    let account
     let supplier_id = searchParams.get('supplier');
     axios
-    .get(API_BASE_URL + 'order/list/' + id)
-    .then((response) => {
-      setItemslist(response.data.itemsList);
-    });
+      .get(API_BASE_URL + 'accounts/edit/' + user.account_id)
+      .then((response) => {
+        setAccount(response.data.account);
+      });
+    axios
+      .get(API_BASE_URL + 'order/list/' + id)
+      .then((response) => {
+        setItemslist(response.data.itemsList);
+      });
     setStatus(searchParams.get('status'));
-  axios
-    .post(API_BASE_URL + 'suppliers/edit', { id: supplier_id })
-    .then((response) => {
-      setSupplier(response.data.supplier);
-    });
+    axios
+      .post(API_BASE_URL + 'suppliers/edit', { id: supplier_id })
+      .then((response) => {
+        setSupplier(response.data.supplier);
+      });
   }, []);
 
   if (!itemslit) {
@@ -175,31 +181,33 @@ function Results({ className, ...rest }) {
   const pdfComponant = (<div ref={tableRef} id="pdfComponant" style={{ width: '793px', height: '1122px', display: 'none', fontFamily: 'helvetica', fontSize: '12pt', color: 'black', padding: '20px' }}>
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div>
-        <h2 style={{ margin: '10px' }}>{user.username}</h2>
-        <h4 style={{ margin: '10px' }}>{user.address}</h4>
+        <h2 style={{ margin: '10px' }}>{account.account_name}</h2>
+        <h4 style={{ margin: '10px' }}>{account.city}</h4>
+        <h4 style={{ margin: '10px' }}>{account.state}</h4>
+        <h4 style={{ margin: '10px' }}>{account.postcode}</h4>
       </div>
       <div>
         <h1>PURCHASE ORDER</h1>
         <h4 style={{ margin: '20px', float: 'right' }}>{'PO: #' + itemslit[0].number}</h4>
-        <h4 style={{ margin: '20px', float: 'right' }}>{moment(itemslit[0].updatedAt).format('DD/MM/YYYY')}</h4>
+        <h4 style={{ margin: '20px', float: 'right' }}>{moment(order_date).format('DD/MM/YYYY')}</h4>
       </div>
     </div>
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div style={{ width: '350px' }}>
         <h4 style={{ backgroundColor: '#19194d', padding: '5px 30px', color: 'white' }}>VENDOR</h4>
-        <h4 style={{ padding: '5px 30px' }}>{supplier.name}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{supplier.email}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{supplier.address}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{supplier.city+", "+supplier.postcode}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account.account_name}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account.company_eamil}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account.address_line1}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account.country + ", " + account.city + ', ' + account.state + ', ' + supplier.postcode}</h4>
         <h4 style={{ padding: '5px 30px' }}>{supplier.phone}</h4>
       </div>
       <div style={{ width: '350px' }}>
         <h4 style={{ backgroundColor: '#19194d', padding: '5px 30px', color: 'white' }}>SHIP TO</h4>
-        {/* <h4 style={{ padding: '5px 30px' }}>Name</h4> */}
-        <h4 style={{ padding: '5px 30px' }}>{user.username}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{user.address}</h4>
-        {/* <h4 style={{ padding: '5px 30px' }}>City, Zip</h4> */}
-        <h4 style={{ padding: '5px 30px' }}>{user.phone}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{supplier.name}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{supplier.email}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{supplier.address}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{supplier.country + ", " + supplier.city + ', ' + supplier.state + ', ' + supplier.postcode}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{supplier.phone}</h4>
       </div>
     </div>
     <table style={{ width: '100%', border: '1px solid black', borderCollapse: 'collapse', marginTop: '20px' }}>

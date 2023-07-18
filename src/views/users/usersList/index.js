@@ -14,6 +14,7 @@ import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import Header from './header';
 import Results from './body';
 import { API_BASE_URL } from 'src/config';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,10 +30,11 @@ function UsersListView() {
   const isMountedRef = useIsMountedRef();
   const [users, setUsers] = useState(null);
   const [accounts, setAccounts] = useState([]);
+  const { user } = useSelector((state) => state.account);
 
   const getUsers = useCallback(() => {
     axios
-      .post(API_BASE_URL + 'users/list')
+      .post(API_BASE_URL + 'users/list', {user_id: user._id})
       .then((response) => {
         if (isMountedRef.current) {
           setUsers(response.data.users);

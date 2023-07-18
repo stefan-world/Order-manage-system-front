@@ -27,15 +27,19 @@ import {
   TextField,
   makeStyles,
   Checkbox,
-  Button
+  Button,
+  LinearProgress,
+  Typography
 } from '@material-ui/core';
 import { Edit as EditIcon } from 'react-feather';
 import Label from 'src/components/Label';
 import { useSelector, useDispatch } from 'react-redux';
 import { API_BASE_URL } from 'src/config';
 import { selectOrder } from 'src/actions/checkboxAction';
+import { saveQuantity } from 'src/actions/quantityAction';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CSVReader from 'react-csv-reader';
+import { useSnackbar } from 'notistack';
 
 const statusOptions = [
   {
@@ -118,6 +122,15 @@ function applySupplyFilters(invoices, filters) {
   });
 }
 
+function applyCheckFilters(items, rows, isChecked) {
+  return items.filter(item => {
+    if(!isChecked)
+      return item
+    if (rows?.indexOf(item._id) !== -1)
+      return item._id; 
+  });
+}
+
 function applyPagination(products, page, limit) {
   return products.slice(page * limit, page * limit + limit);
 }
@@ -177,6 +190,14 @@ function Results({ className, products, deleteProduct, ...rest }) {
   const { user } = useSelector((state) => state.account);
   const [suppliers, setSupplier] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [quantity, setQuantity] = useState([]);
+  const [progress, setProgress] = useState(0);
+  const { enqueueSnackbar } = useSnackbar();
+  const [batchCount, setBatchCount] = useState(0);
+  const [total, setTotal] = useState();
+  const [checked_filter, setChecked_filter] = useState(false);  
+  const checkedRows = useSelector((state) => state.selectedRows);
+  const [selectedRows, setSelectedRows] = useState(checkedRows.checkedRows);
 
   const getProducts = useCallback(() => {
     axios.get(API_BASE_URL + 'suppliers/list/' + user._id)
@@ -189,7 +210,13 @@ function Results({ className, products, deleteProduct, ...rest }) {
     getProducts();
   }, [getProducts]);
 
-  const checkedRows = useSelector((state) => state.selectedRows)
+  useEffect(() => {
+    if (batchCount === total) {
+      enqueueSnackbar('Imported CSV successfully!', {
+        variant: 'success',
+      });
+    }
+  }, [batchCount, total]);
 
   const supplierOptions = suppliers
     .map((el) => {
@@ -247,15 +274,15 @@ function Results({ className, products, deleteProduct, ...rest }) {
     setLimit(event.target.value);
   };
 
-  const filteredProducts = applyFilters(products, filters);
+  const filteredProducts = applyFilters(products, filters); console.log("rows: ", selectedRows)
   const supplierFilteredProducts = applySupplyFilters(filteredProducts, filter_sup);
-  const searchedProducts = supplierFilteredProducts.filter(item =>
+  const checkedProducts = applyCheckFilters(supplierFilteredProducts, selectedRows, checked_filter);
+  const searchedProducts = checkedProducts.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
   const sortedProducts = applySort(searchedProducts, sort);
   const paginatedProducts = applyPagination(sortedProducts, page, limit);
-
-  const [selectedRows, setSelectedRows] = useState(checkedRows.checkedRows);
 
   const handleRowSelection = (event, rowId) => {
     const selectedIndex = selectedRows.indexOf(rowId);
@@ -282,6 +309,26 @@ function Results({ className, products, deleteProduct, ...rest }) {
     event.stopPropagation();
   }
 
+  const handleQuantityChan = (e, id) => {
+    const index = quantity.findIndex(item => item[id] !== undefined);
+
+    if (index === -1) {
+      setQuantity([...quantity, { [id]: e.target.value }]);
+    } else {
+      const updatedQuantity = quantity.map(item => {
+        if (item[id] !== undefined) {
+          return { [id]: e.target.value };
+        } else {
+          return item;
+        }
+      });
+      setQuantity(updatedQuantity);
+    }
+
+  }
+
+  dispatch(saveQuantity(quantity));
+
   function handleFile(data, fileInfo) {
     const batchSize = 100; // Maximum batch size
     const productsList = data.slice(1); // Remove header row
@@ -290,23 +337,39 @@ function Results({ className, products, deleteProduct, ...rest }) {
       alert("Please select supplier");
       return;
     }
+    const totalBatches = Math.ceil(productsList.length / batchSize);
+    setTotal(totalBatches);
+
     while (index < productsList.length) {
       const batch = productsList.slice(index, index + batchSize);
-
       axios.post(API_BASE_URL + 'product/importcsv', {
         id: user._id,
         supplier_id: filter_sup.status,
         products_list: batch
+      }, {
+        // onUploadProgress: (progressEvent) => {
+        //   const progress = Math.round((index ) / productsList.length * 100);
+        //   console.log(progress, progressEvent)
+        //   setProgress(progress);
+        // }
       })
         .then((response) => {
           console.log(`Batch ${index / batchSize + 1} sent successfully!`);
+          setBatchCount(prevCount => prevCount + 1);
         })
         .catch((error) => {
           console.error(`Error sending batch ${index / batchSize + 1}:`, error);
+          enqueueSnackbar(error.message, {
+            variant: 'error'
+          });
         });
 
       index += batchSize;
     }
+  }
+
+  function change_filter(){
+    setChecked_filter(!checked_filter);
   }
 
   return (
@@ -389,10 +452,10 @@ function Results({ className, products, deleteProduct, ...rest }) {
           onFileLoaded={handleFile}
           inputId="csv-input"
           inputStyle={{ display: 'none' }}
-        />
-        {/* <button onClick={() => document.getElementById('csv-input').click()}>
-          Import CSV
-        </button> */}
+        >
+          
+        </CSVReader>
+        <LinearProgress variant="determinate" value={progress} />
         <Button
           color="secondary"
           variant="contained"
@@ -401,7 +464,7 @@ function Results({ className, products, deleteProduct, ...rest }) {
           to='/app/products/productList'
           onClick={() => document.getElementById('csv-input').click()}
         >
-          CSV
+          Import Products
         </Button>
       </Box>
       <PerfectScrollbar>
@@ -410,7 +473,7 @@ function Results({ className, products, deleteProduct, ...rest }) {
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
-                  <Checkbox />
+                  <Checkbox checked={checked_filter} onClick={change_filter}/>
                 </TableCell>
                 <TableCell>
                   ID
@@ -472,6 +535,7 @@ function Results({ className, products, deleteProduct, ...rest }) {
               {paginatedProducts.map((product) => {
                 const isRowSelected = selectedRows.indexOf(product._id) !== -1;
                 const isRowDisabled = product.status;
+                const value = quantity.find(item => item[product._id] !== undefined);
                 return (
                   <TableRow
                     key={product._id}
@@ -515,9 +579,14 @@ function Results({ className, products, deleteProduct, ...rest }) {
                     <TableCell style={{ width: '150px', alignItems: 'center' }}>
                       <TextField
                         onClick={handleEnterQuantity}
-                        type="number"
                         name={product._id + "-quantity"}
-                        disabled={isRowSelected === false} />
+                        type="number"
+                        value={
+                          quantity.find(item => item[product._id] !== undefined) ? quantity.find(item => item[product._id] !== undefined)[product._id] : ''
+                        }
+                        onChange={(e) => handleQuantityChan(e, product._id)}
+                        disabled={isRowSelected === false}
+                      />
                     </TableCell>
                     <TableCell>
                       {product.currency}

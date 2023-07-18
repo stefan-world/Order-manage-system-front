@@ -13,6 +13,7 @@ import {
   makeStyles,
   MenuItem
 } from '@material-ui/core';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(() => ({
   root: {}
@@ -22,7 +23,8 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [accounts, setAccounts] = useState([]);
-
+  const { user } = useSelector((state) => state.account);
+  
   useEffect(() => {
     axios.post(API_BASE_URL + 'accounts/list')
     .then((response) => {
@@ -50,7 +52,7 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
         role: Yup.string().required('Status is required'),
         address: Yup.string().max(255).required('Address is required'),
         status: Yup.string().max(255).required('State is required'),
-        account_id: Yup.string().max(255).required('Account is required'),
+        // account_id: Yup.string().max(255).required('Account is required'),
       })}
       onSubmit={async (values, {
         setErrors,
@@ -59,8 +61,10 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
       }) => {
         try {
           // Make API request     
-          const { username, email, password, phone, role, address, status, account_id } = values;
-          var data = '';
+          let { username, email, password, phone, role, address, status, account_id } = values;
+          var data = ''; 
+          if(user.role == "admin")
+            account_id = user.account_id;
           await axios.post(API_BASE_URL + 'signup', { username, email, password, phone, role, address, status, account_id })
             .then((response) => {
               data = response.data;
@@ -193,7 +197,7 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
             <MenuItem id={"active"} value={"active"}>Active</MenuItem>
             <MenuItem id={"deactive"} value={"deactive"}>Deactive</MenuItem>
           </TextField>
-          <TextField
+          {user.role == "super_admin" && <TextField
             select
             fullWidth
             margin="normal"
@@ -209,7 +213,7 @@ function RegisterForm({ className, onSubmitSuccess, ...rest }) {
                 {option.account_name}
               </MenuItem>
             ))}
-          </TextField>
+          </TextField>}
 
           <Box mt={2}>
             <Button

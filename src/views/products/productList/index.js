@@ -10,7 +10,6 @@ import {
 } from '@material-ui/core';
 import axios from 'src/utils/axios';
 import Page from 'src/components/Page';
-import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import Header from './header';
 import Results from './body';
 import { API_BASE_URL } from 'src/config';
@@ -26,22 +25,19 @@ const useStyles = makeStyles((theme) => ({
 
 function ProductsListView() {
   const classes = useStyles();
-  const isMountedRef = useIsMountedRef();
-  const [products, setProducts] = useState(null);
+  const [products, setProducts] = useState([]);
   const { user } = useSelector((state) => state.account);
 
   const getCustomers = useCallback(() => {
     axios
       .get(API_BASE_URL + 'product/list/'+user._id)
       .then((response) => {
-        if (isMountedRef.current) {
           setProducts(response.data.products);
-        }
       });
-  }, [isMountedRef]);
+  }, []);
   useEffect(() => {
     getCustomers();
-  }, [getCustomers]);
+  }, []);
 
   if (!products) {
     return null;
@@ -51,24 +47,20 @@ function ProductsListView() {
     axios
       .get(API_BASE_URL + 'product/delete/' + Id)
       .then((response) => {
-        if (isMountedRef.current) {
           setProducts(response.data.products);
-        }
       });
   }
 
   return (
     <Page
-      className={classes.root}
+      className={{root: classes.root}}
       title="Partners List"
     >
       <Container maxWidth={false}>
         <Header />
-        {products && (
           <Box mt={10} >
             <Results products={products} deleteProduct={onDelete} />
           </Box>
-        )}
       </Container>
     </Page>
   );

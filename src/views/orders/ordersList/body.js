@@ -205,7 +205,7 @@ function Results({ className, orders, deleteOrder, ...rest }) {
                     <TableCell align="right">
                       <IconButton
                         component={RouterLink}
-                        to={"/app/orders/orderedItemsList/?Id=" + order._id + "&status=" + order.status + "&supplier=" + order.supplier_id}
+                        to={"/app/orders/orderedItemsList/?Id=" + order._id + "&status=" + order.status + "&supplier=" + order.supplier_id + "&date=" + order.updatedAt}
                       >
                         <SvgIcon fontSize="small">
                           <Visibility />

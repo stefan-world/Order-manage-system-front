@@ -270,7 +270,7 @@ function Results({ className, accounts, deletAccount, ...rest }) {
                           <EditIcon />
                         </SvgIcon>
                       </IconButton>
-                      {(account.role !== "admin") &&
+                      {(account.role == 'user') &&
                         <IconButton
                           onClick={() => { if (window.confirm('Are you really want to delete?')) deletAccount(account._id) }}
                         >

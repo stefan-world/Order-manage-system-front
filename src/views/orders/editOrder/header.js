@@ -12,9 +12,7 @@ import {
   Typography,
   makeStyles
 } from '@material-ui/core';
-import {
-  PlusCircle as PlusCircleIcon
-} from 'react-feather';
+import UpdateIcon from '@material-ui/icons/Update'
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectOrder } from 'src/actions/checkboxAction';
@@ -42,6 +40,7 @@ function Header({ className, ...rest }) {
   const { user } = useSelector((state) => state.account);
   const dispatch = useDispatch();
   const { checkedRows } = useSelector((state) => state.selectedRows);
+  const { quantity } = useSelector((state) => state.quantity);
   const history = useHistory();
   let quantityFlag = false;
   const searchParams = new URLSearchParams(location.search);
@@ -49,11 +48,12 @@ function Header({ className, ...rest }) {
   const updateProducts = () => {
     let id = searchParams.get('Id');
     let status = searchParams.get('status');
-    const quantity = checkedRows.map((product_id) => {
-      const productQT = document.getElementsByName(product_id + "-quantity")[0].value;
-      if (productQT == '')
+    const check_quantity = checkedRows.map((product_id) => {
+      const single_quantity = quantity.find(item => item[product_id] !== undefined);
+      if (single_quantity === undefined)
         quantityFlag = true;
-      return productQT;
+      else
+        return single_quantity[product_id];
     })
 
     if (quantityFlag) {
@@ -63,10 +63,10 @@ function Header({ className, ...rest }) {
       axios.post(API_BASE_URL + 'ordersList/update', {
         'order_id': id,
         'products_id': checkedRows,
-        'products_quantity': quantity,
+        'products_quantity': check_quantity,
         'account_id': user.account_id,
       }).then(res => {
-        history.push("/app/orders/orderedItemsList/?Id=" + res.data.order._id + "&&status=" + res.data.order.status + "&&supplier=" + res.data.order.supplier_id)
+        history.push("/app/orders/orderedItemsList/?Id=" + res.data.order._id + "&status=" + res.data.order.status + "&supplier=" + res.data.order.supplier_id + "&date=" + res.data.order.updatedAt)
       })
     }
 
@@ -127,7 +127,7 @@ function Header({ className, ...rest }) {
             fontSize="small"
             className={classes.actionIcon}
           >
-            <PlusCircleIcon />
+            <UpdateIcon />
           </SvgIcon>
           Update Order
         </Button>

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 function AdminGuard({ children }) {
   const account = useSelector((state) => state.account);
 
-  if (account.user.role !== "admin") {
+  if (account.user.role == 'user') {
     return <Redirect to="/home" />;
   }
 
