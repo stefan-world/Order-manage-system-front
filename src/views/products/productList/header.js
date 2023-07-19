@@ -20,6 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectOrder } from 'src/actions/checkboxAction';
 import { useHistory } from 'react-router';
 import { API_BASE_URL } from 'src/config';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -42,6 +43,7 @@ function Header({ className, ...rest }) {
   const dispatch = useDispatch(); 
   const { checkedRows } = useSelector((state) => state.selectedRows);
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
   let quantityFlag = false;
   const orderProducts = (id) => {
     const check_quantity = checkedRows.map((product_id) => {
@@ -62,6 +64,10 @@ function Header({ className, ...rest }) {
         'user_id': id,
       }).then(res => {
         history.push("/app/orders/orderedItemsList/?Id=" + res.data.order._id + "&status=" + res.data.order.status + "&supplier=" + res.data.order.supplier_id + "&supplier=" + res.data.order.supplier_id + "&date=" + res.data.order.updatedAt)
+      }).catch((error) => {
+        enqueueSnackbar(error.message, {
+          variant: 'error'
+        });
       })
     }
 

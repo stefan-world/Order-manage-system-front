@@ -152,7 +152,7 @@ function Results({ className, ...rest }) {
           format: 'a4'
         });
         pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-        pdf.save('table.pdf');
+        pdf.save(supplier.name + '.pdf');
       });
     document.getElementById("pdfComponant").style.display = "none";
   }
@@ -180,10 +180,10 @@ function Results({ className, ...rest }) {
   const pdfComponant = (<div ref={tableRef} id="pdfComponant" style={{ width: '793px', height: '1122px', display: 'none', fontFamily: 'helvetica', fontSize: '12pt', color: 'black', padding: '20px' }}>
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div>
-        <h2 style={{ margin: '10px' }}>{account.account_name}</h2>
-        <h4 style={{ margin: '10px' }}>{account.city}</h4>
-        <h4 style={{ margin: '10px' }}>{account.state}</h4>
-        <h4 style={{ margin: '10px' }}>{account.postcode}</h4>
+        <h2 style={{ margin: '10px' }}>{account?account.account_name:user.username}</h2>
+        <h4 style={{ margin: '10px' }}>{account?account.city:user.city}</h4>
+        <h4 style={{ margin: '10px' }}>{account?account.state:user.state}</h4>
+        <h4 style={{ margin: '10px' }}>{account?account.postcode:user.postcode}</h4>
       </div>
       <div>
         <h1>PURCHASE ORDER</h1>
@@ -202,11 +202,11 @@ function Results({ className, ...rest }) {
       </div>
       <div style={{ width: '350px' }}>
         <h4 style={{ backgroundColor: '#19194d', padding: '5px 30px', color: 'white' }}>VENDOR</h4>
-        <h4 style={{ padding: '5px 30px' }}>{account.account_name}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{account.company_eamil}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{account.address_line1}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{account.country + ", " + account.city + ', ' + account.state + ', ' + supplier.postcode}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{supplier.phone}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account?account.account_name:user.username}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account?account.company_email:user.email}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account?account.address_line1:user.address}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account ? `${account.country}, ${account.city}, ${account.state}, ${account.postcode}` : 'Australia, Sydney, AAA, 123'}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account?account.phone:user.phone}</h4>
       </div>
     </div>
     <table style={{ width: '100%', border: '1px solid black', borderCollapse: 'collapse', marginTop: '20px' }}>
