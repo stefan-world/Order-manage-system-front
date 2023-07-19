@@ -226,6 +226,9 @@ function Results({ className, users, accounts, deletUser, ...rest }) {
                   User Name
                 </TableCell>
                 <TableCell>
+                  Account
+                </TableCell>
+                <TableCell>
                   Email
                 </TableCell>
                 <TableCell>
@@ -275,6 +278,11 @@ function Results({ className, users, accounts, deletUser, ...rest }) {
                           </Link>
                         </div>
                       </Box>
+                    </TableCell>
+                    <TableCell>
+                      {user.role == "super_admin" ? "Sueper Admin"
+                      : accounts.filter(account => account._id === user.account_id)[0].account_name 
+                      }
                     </TableCell>
                     <TableCell>
                       {user.email}

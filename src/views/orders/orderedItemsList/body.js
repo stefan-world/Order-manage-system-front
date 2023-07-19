@@ -20,7 +20,6 @@ import {
   Button,
   SvgIcon,
 } from '@material-ui/core';
-import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axios from 'src/utils/axios';
@@ -194,19 +193,19 @@ function Results({ className, ...rest }) {
     </div>
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div style={{ width: '350px' }}>
-        <h4 style={{ backgroundColor: '#19194d', padding: '5px 30px', color: 'white' }}>VENDOR</h4>
-        <h4 style={{ padding: '5px 30px' }}>{account.account_name}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{account.company_eamil}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{account.address_line1}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{account.country + ", " + account.city + ', ' + account.state + ', ' + supplier.postcode}</h4>
-        <h4 style={{ padding: '5px 30px' }}>{supplier.phone}</h4>
-      </div>
-      <div style={{ width: '350px' }}>
         <h4 style={{ backgroundColor: '#19194d', padding: '5px 30px', color: 'white' }}>SHIP TO</h4>
         <h4 style={{ padding: '5px 30px' }}>{supplier.name}</h4>
         <h4 style={{ padding: '5px 30px' }}>{supplier.email}</h4>
         <h4 style={{ padding: '5px 30px' }}>{supplier.address}</h4>
         <h4 style={{ padding: '5px 30px' }}>{supplier.country + ", " + supplier.city + ', ' + supplier.state + ', ' + supplier.postcode}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{supplier.phone}</h4>
+      </div>
+      <div style={{ width: '350px' }}>
+        <h4 style={{ backgroundColor: '#19194d', padding: '5px 30px', color: 'white' }}>VENDOR</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account.account_name}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account.company_eamil}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account.address_line1}</h4>
+        <h4 style={{ padding: '5px 30px' }}>{account.country + ", " + account.city + ', ' + account.state + ', ' + supplier.postcode}</h4>
         <h4 style={{ padding: '5px 30px' }}>{supplier.phone}</h4>
       </div>
     </div>

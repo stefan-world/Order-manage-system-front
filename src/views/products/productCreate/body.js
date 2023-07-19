@@ -80,8 +80,6 @@ function ProductCreateForm({ className, ...rest }) {
       }}
       validationSchema={Yup.object().shape({
         name: Yup.string().max(255).required('name is required'),
-        description: Yup.string().max(255).required('Description is required'),
-        price: Yup.number().min(0).required('Price is required'),
         status: Yup.string().required('Status is required'),
         supplier: Yup.string().required('Supplier is required'),
       })}
@@ -330,9 +328,7 @@ function ProductCreateForm({ className, ...rest }) {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <TextField
-                    error={Boolean(touched.showInOnline && errors.showInOnline)}
                     fullWidth
-                    helperText={(touched.showInOnline && errors.showInOnline)}
                     label="ShowInOnline"
                     name="showInOnline"
                     type="string"
@@ -364,6 +360,8 @@ function ProductCreateForm({ className, ...rest }) {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <TextField
+                    error={Boolean(touched.supplier && errors.supplier)}
+                    helperText={(touched.supplier && errors.supplier)}
                     select
                     fullWidth
                     name="supplier"
