@@ -95,6 +95,7 @@ function Results({ className, orders, deleteOrder, ...rest }) {
   const [filters, setFilters] = useState({
     status: null
   });
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleStatusChange = (event) => {
     event.persist();
@@ -115,13 +116,21 @@ function Results({ className, orders, deleteOrder, ...rest }) {
     setPage(newPage);
   };
 
+  const handleSearchTermChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
 
   // Usually query is done on backend with indexing solutions
   const filteredOrders = applyFilters(orders, filters);
-  const paginatedOrders = applyPagination(filteredOrders, page, limit);
+  const searchedOrders = filteredOrders.filter(item =>
+    item.supplier.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const paginatedOrders = applyPagination(searchedOrders, page, limit);
+
 
   return (
     <Card
@@ -153,6 +162,12 @@ function Results({ className, orders, deleteOrder, ...rest }) {
             ))}
           </TextField>
           <Box flexGrow={1} />
+          <TextField
+            label="Search"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchTermChange}
+          />
         </Box>
       </Box>
       <PerfectScrollbar>
@@ -181,7 +196,7 @@ function Results({ className, orders, deleteOrder, ...rest }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              { paginatedOrders.map((order) => {
+              {paginatedOrders.map((order) => {
                 return (
                   <TableRow
                     hover

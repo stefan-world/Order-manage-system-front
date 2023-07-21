@@ -98,6 +98,7 @@ function Results({ className, suppliers, deleteSupplier, ...rest }) {
   const [filters, setFilters] = useState({
     status: null
   });
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleStatusChange = (event) => {
     event.persist();
@@ -114,6 +115,9 @@ function Results({ className, suppliers, deleteSupplier, ...rest }) {
     }));
   };
 
+  const handleSearchTermChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -125,7 +129,10 @@ function Results({ className, suppliers, deleteSupplier, ...rest }) {
 
   // Usually query is done on backend with indexing solutions
   const filteredSuppliers = applyFilters(suppliers, filters);
-  const paginatedSuppliers = applyPagination(filteredSuppliers, page, limit);
+  const searchedSuppliers = filteredSuppliers.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const paginatedSuppliers = applyPagination(searchedSuppliers, page, limit);
 
   return (
     <Card
@@ -157,6 +164,12 @@ function Results({ className, suppliers, deleteSupplier, ...rest }) {
             ))}
           </TextField>
           <Box flexGrow={1} />
+          <TextField
+            label="Search"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchTermChange}
+          />
         </Box>
       </Box>
       <PerfectScrollbar>

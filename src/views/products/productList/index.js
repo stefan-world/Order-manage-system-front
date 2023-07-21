@@ -58,7 +58,7 @@ function ProductsListView() {
     >
       <Container maxWidth={false}>
         <Header />
-          <Box mt={10} >
+          <Box mt={5} pt={5}  style={{position: "relative"}}>
             <Results products={products} deleteProduct={onDelete} />
           </Box>
       </Container>

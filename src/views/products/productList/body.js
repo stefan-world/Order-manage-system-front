@@ -29,7 +29,6 @@ import {
   Checkbox,
   Button,
   LinearProgress,
-  Typography
 } from '@material-ui/core';
 import { Edit as EditIcon } from 'react-feather';
 import Label from 'src/components/Label';
@@ -124,10 +123,10 @@ function applySupplyFilters(invoices, filters) {
 
 function applyCheckFilters(items, rows, isChecked) {
   return items.filter(item => {
-    if(!isChecked)
+    if (!isChecked)
       return item
     if (rows?.indexOf(item._id) !== -1)
-      return item._id; 
+      return item._id;
   });
 }
 
@@ -192,10 +191,9 @@ function Results({ className, products, deleteProduct, ...rest }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [quantity, setQuantity] = useState([]);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const [batchCount, setBatchCount] = useState(0);
-  const [total, setTotal] = useState();
-  const [checked_filter, setChecked_filter] = useState(false);  
+  const [checked_filter, setChecked_filter] = useState(false);
   const checkedRows = useSelector((state) => state.selectedRows);
   const [selectedRows, setSelectedRows] = useState(checkedRows.checkedRows);
 
@@ -209,14 +207,6 @@ function Results({ className, products, deleteProduct, ...rest }) {
   useEffect(() => {
     getProducts();
   }, [getProducts]);
-
-  useEffect(() => {
-    if (batchCount === total) {
-      enqueueSnackbar('Imported CSV successfully!', {
-        variant: 'success',
-      });
-    }
-  }, [batchCount, total]);
 
   const supplierOptions = suppliers
     .map((el) => {
@@ -280,7 +270,7 @@ function Results({ className, products, deleteProduct, ...rest }) {
   const searchedProducts = checkedProducts.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   const sortedProducts = applySort(searchedProducts, sort);
   const paginatedProducts = applyPagination(sortedProducts, page, limit);
 
@@ -332,13 +322,14 @@ function Results({ className, products, deleteProduct, ...rest }) {
   function handleFile(data, fileInfo) {
     const batchSize = 100; // Maximum batch size
     const productsList = data.slice(1); // Remove header row
+    let resCount = 0;
     let index = 0;
     if (filter_sup.status == null) {
       alert("Please select supplier");
       return;
     }
     const totalBatches = Math.ceil(productsList.length / batchSize);
-    setTotal(totalBatches);
+    setLoading(true)
 
     while (index < productsList.length) {
       const batch = productsList.slice(index, index + batchSize);
@@ -346,18 +337,20 @@ function Results({ className, products, deleteProduct, ...rest }) {
         id: user._id,
         supplier_id: filter_sup.status,
         products_list: batch
-      }, {
-        // onUploadProgress: (progressEvent) => {
-        //   const progress = Math.round((index ) / productsList.length * 100);
-        //   console.log(progress, progressEvent)
-        //   setProgress(progress);
-        // }
+      }).then((response) => {
+        console.log(`Batch ${index / batchSize + 1} sent successfully!`);
+        resCount++
+        const progress = Math.round(resCount / totalBatches * 100);
+        setProgress(progress);
+        if (totalBatches == resCount) {
+          setLoading(false);
+          enqueueSnackbar('Imported CSV successfully!', {
+            variant: 'success',
+          });
+        }
       })
-        .then((response) => {
-          console.log(`Batch ${index / batchSize + 1} sent successfully!`);
-          setBatchCount(prevCount => prevCount + 1);
-        })
         .catch((error) => {
+          setLoading(false);
           console.error(`Error sending batch ${index / batchSize + 1}:`, error);
           enqueueSnackbar(error.message, {
             variant: 'error'
@@ -366,289 +359,294 @@ function Results({ className, products, deleteProduct, ...rest }) {
 
       index += batchSize;
     }
+    setProgress(0);
   }
 
-  function change_filter(){
+  function change_filter() {
     setChecked_filter(!checked_filter);
   }
 
   return (
-    <Card
-      className={clsx(classes.root, className)}
-      {...rest}
-    >
-      <Divider />
-      <Box
-        p={2}
-        minHeight={56}
-        display="flex"
-        alignItems="center"
+    <>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {loading && <LinearProgress variant="determinate" value={progress} style={{ width: '50%', height: '10px', marginTop: '-10px'}} />}
+      </div>
+      <Card
+        className={clsx(classes.root, className)}
+        {...rest}
       >
-        <TextField
-          label="Status"
-          name="status"
-          onChange={handleStatusChange}
-          select
-          SelectProps={{ native: true }}
-          value={filters.status || 'all'}
-          variant="outlined"
+        <Divider />
+        <Box
+          p={2}
+          minHeight={56}
+          display="flex"
+          alignItems="center"
         >
-          {statusOptions.map((statusOption) => (
-            <option
-              key={statusOption.id}
-              value={statusOption.id}
-            >
-              {statusOption.name}
-            </option>
-          ))}
-        </TextField>
-        <Box flexGrow={1} />
-        <TextField
-          label="Supplier"
-          name="supplier"
-          onChange={handleSupplierChange}
-          select
-          SelectProps={{ native: true }}
-          value={filter_sup.status || 'all'}
-          variant="outlined"
-        >
-          {supplierOptions.map((statusOption) => (
-            <option
-              key={statusOption.id}
-              value={statusOption.id}
-            >
-              {statusOption.name}
-            </option>
-          ))}
-        </TextField>
-        <Box flexGrow={1} />
-        <TextField
-          label="Search"
-          variant="outlined"
-          value={searchTerm}
-          onChange={handleSearchTermChange}
-        />
-        <Box flexGrow={5} />
-        <TextField
-          label="Sort By"
-          name="sort"
-          onChange={handleSortChange}
-          select
-          SelectProps={{ native: true }}
-          value={sort}
-          variant="outlined"
-        >
-          {sortOptions.map((option) => (
-            <option
-              key={option.value}
-              value={option.value}
-            >
-              {option.label}
-            </option>
-          ))}
-        </TextField>
-        <Box flexGrow={1} />
-        <CSVReader
-          onFileLoaded={handleFile}
-          inputId="csv-input"
-          inputStyle={{ display: 'none' }}
-        >
-          
-        </CSVReader>
-        <LinearProgress variant="determinate" value={progress} />
-        <Button
-          color="secondary"
-          variant="contained"
-          className={classes.action}
-          component={RouterLink}
-          to='/app/products/productList'
-          onClick={() => document.getElementById('csv-input').click()}
-        >
-          Import Products
-        </Button>
-      </Box>
-      <PerfectScrollbar>
-        <Box minWidth={700}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox checked={checked_filter} onClick={change_filter}/>
-                </TableCell>
-                <TableCell>
-                  ID
-                </TableCell>
-                <TableCell>
-                  Name
-                </TableCell>
-                {/* <TableCell>
+          <TextField
+            label="Status"
+            name="status"
+            onChange={handleStatusChange}
+            select
+            SelectProps={{ native: true }}
+            value={filters.status || 'all'}
+            variant="outlined"
+          >
+            {statusOptions.map((statusOption) => (
+              <option
+                key={statusOption.id}
+                value={statusOption.id}
+              >
+                {statusOption.name}
+              </option>
+            ))}
+          </TextField>
+          <Box flexGrow={1} />
+          <TextField
+            label="Supplier"
+            name="supplier"
+            onChange={handleSupplierChange}
+            select
+            SelectProps={{ native: true }}
+            value={filter_sup.status || 'all'}
+            variant="outlined"
+          >
+            {supplierOptions.map((statusOption) => (
+              <option
+                key={statusOption.id}
+                value={statusOption.id}
+              >
+                {statusOption.name}
+              </option>
+            ))}
+          </TextField>
+          <Box flexGrow={1} />
+          <TextField
+            label="Search"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchTermChange}
+          />
+          <Box flexGrow={5} />
+          <TextField
+            label="Sort By"
+            name="sort"
+            onChange={handleSortChange}
+            select
+            SelectProps={{ native: true }}
+            value={sort}
+            variant="outlined"
+          >
+            {sortOptions.map((option) => (
+              <option
+                key={option.value}
+                value={option.value}
+              >
+                {option.label}
+              </option>
+            ))}
+          </TextField>
+          <Box flexGrow={1} />
+          <CSVReader
+            onFileLoaded={handleFile}
+            inputId="csv-input"
+            inputStyle={{ display: 'none' }}
+          >
+
+          </CSVReader>
+          <Button
+            color="secondary"
+            variant="contained"
+            className={classes.action}
+            component={RouterLink}
+            to='/app/products/productList'
+            onClick={() => document.getElementById('csv-input').click()}
+          >
+            Import Products
+          </Button>
+        </Box>
+        <PerfectScrollbar>
+          <Box minWidth={700}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox checked={checked_filter} onClick={change_filter} />
+                  </TableCell>
+                  <TableCell>
+                    ID
+                  </TableCell>
+                  <TableCell>
+                    Name
+                  </TableCell>
+                  {/* <TableCell>
                   Image
                 </TableCell> */}
-                <TableCell>
-                  Brand
-                </TableCell>
-                <TableCell>
-                  Category
-                </TableCell>
-                <TableCell>
-                  Subcategory
-                </TableCell>
-                <TableCell>
-                  Bar Code
-                </TableCell>
-                <TableCell>
-                  Purchase
-                </TableCell>
-                <TableCell>
-                  Order Quantity
-                </TableCell>
-                <TableCell>
-                  Sales Price
-                </TableCell>
-                <TableCell>
-                  Available
-                </TableCell>
-                <TableCell>
-                  Tax
-                </TableCell>
-                <TableCell>
-                  Weighable
-                </TableCell>
-                <TableCell>
-                  Show In Online
-                </TableCell>
-                <TableCell>
-                  Status
-                </TableCell>
-                <TableCell>
-                  Description
-                </TableCell>
-                <TableCell>
-                  Date
-                </TableCell>
-                <TableCell align="right">
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedProducts.map((product) => {
-                const isRowSelected = selectedRows.indexOf(product._id) !== -1;
-                const isRowDisabled = product.status;
-                const value = quantity.find(item => item[product._id] !== undefined);
-                return (
-                  <TableRow
-                    key={product._id}
-                    hover
-                    onClick={isRowDisabled === "deactive" ? null : (event) => handleRowSelection(event, product._id)}
-                    role="checkbox"
-                    aria-checked={isRowSelected}
-                    selected={isRowSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox checked={isRowSelected} disabled={isRowDisabled === "deactive"} />
-                    </TableCell>
-                    <TableCell>
-                      {product.number}
-                    </TableCell>
-                    <TableCell>
-                      {product.name}
-                    </TableCell>
-                    {/* <TableCell>
+                  <TableCell>
+                    Brand
+                  </TableCell>
+                  <TableCell>
+                    Category
+                  </TableCell>
+                  <TableCell>
+                    Subcategory
+                  </TableCell>
+                  <TableCell>
+                    Bar Code
+                  </TableCell>
+                  <TableCell>
+                    Purchase
+                  </TableCell>
+                  <TableCell>
+                    Order Quantity
+                  </TableCell>
+                  <TableCell>
+                    Sales Price
+                  </TableCell>
+                  <TableCell>
+                    Available
+                  </TableCell>
+                  <TableCell>
+                    Tax
+                  </TableCell>
+                  <TableCell>
+                    Weighable
+                  </TableCell>
+                  <TableCell>
+                    Show In Online
+                  </TableCell>
+                  <TableCell>
+                    Status
+                  </TableCell>
+                  <TableCell>
+                    Description
+                  </TableCell>
+                  <TableCell>
+                    Date
+                  </TableCell>
+                  <TableCell align="right">
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedProducts.map((product) => {
+                  const isRowSelected = selectedRows.indexOf(product._id) !== -1;
+                  const isRowDisabled = product.status;
+                  const value = quantity.find(item => item[product._id] !== undefined);
+                  return (
+                    <TableRow
+                      key={product._id}
+                      hover
+                      onClick={isRowDisabled === "deactive" ? null : (event) => handleRowSelection(event, product._id)}
+                      role="checkbox"
+                      aria-checked={isRowSelected}
+                      selected={isRowSelected}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox checked={isRowSelected} disabled={isRowDisabled === "deactive"} />
+                      </TableCell>
+                      <TableCell>
+                        {product.number}
+                      </TableCell>
+                      <TableCell>
+                        {product.name}
+                      </TableCell>
+                      {/* <TableCell>
                       <Avatar
                         className={classes.avatar}
                         src={product.avatar}
                       >
                       </Avatar>
                     </TableCell> */}
-                    <TableCell>
-                      {product.brand}
-                    </TableCell>
-                    <TableCell>
-                      {product.category}
-                    </TableCell>
-                    <TableCell>
-                      {product.subcategory}
-                    </TableCell>
-                    <TableCell>
-                      {product.barcode}
-                    </TableCell>
-                    <TableCell>
-                      {product.purchase}
-                    </TableCell>
-                    <TableCell style={{ width: '150px', alignItems: 'center' }}>
-                      <TextField
-                        onClick={handleEnterQuantity}
-                        name={product._id + "-quantity"}
-                        type="number"
-                        value={
-                          quantity.find(item => item[product._id] !== undefined) ? quantity.find(item => item[product._id] !== undefined)[product._id] : ''
-                        }
-                        onChange={(e) => handleQuantityChan(e, product._id)}
-                        disabled={isRowSelected === false}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {product.currency}
-                      {product.price}
-                    </TableCell>
-                    <TableCell>
-                      {product.available}
-                    </TableCell>
-                    <TableCell>
-                      {product.tax}
-                    </TableCell>
+                      <TableCell>
+                        {product.brand}
+                      </TableCell>
+                      <TableCell>
+                        {product.category}
+                      </TableCell>
+                      <TableCell>
+                        {product.subcategory}
+                      </TableCell>
+                      <TableCell>
+                        {product.barcode}
+                      </TableCell>
+                      <TableCell>
+                        {product.purchase}
+                      </TableCell>
+                      <TableCell style={{ width: '150px', alignItems: 'center' }}>
+                        <TextField
+                          onClick={handleEnterQuantity}
+                          name={product._id + "-quantity"}
+                          type="number"
+                          value={
+                            quantity.find(item => item[product._id] !== undefined) ? quantity.find(item => item[product._id] !== undefined)[product._id] : ''
+                          }
+                          onChange={(e) => handleQuantityChan(e, product._id)}
+                          disabled={isRowSelected === false}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {product.currency}
+                        {product.price}
+                      </TableCell>
+                      <TableCell>
+                        {product.available}
+                      </TableCell>
+                      <TableCell>
+                        {product.tax}
+                      </TableCell>
 
-                    <TableCell>
-                      {product.weighable}
-                    </TableCell>
-                    <TableCell>
-                      {product.showInOnline}
-                    </TableCell>
+                      <TableCell>
+                        {product.weighable}
+                      </TableCell>
+                      <TableCell>
+                        {product.showInOnline}
+                      </TableCell>
 
-                    <TableCell>
-                      {getStatusLabel(product.status)}
-                    </TableCell>
-                    <TableCell>
-                      {product.description}
-                    </TableCell>
-                    <TableCell>
-                      {moment(product.updatedAt).format('DD/MM/YYYY')}
-                    </TableCell>
-                    <TableCell align="right">
-                      <IconButton
-                        component={RouterLink}
-                        to={"/app/products/productEdit/" + product._id}
-                      >
-                        <SvgIcon fontSize="small">
-                          <EditIcon />
-                        </SvgIcon>
-                      </IconButton>
-                      <IconButton
-                        onClick={() => { if (window.confirm('Are you really want to delete?')) deleteProduct(product._id) }}
-                      >
-                        <SvgIcon fontSize="small">
-                          <DeleteIcon />
-                        </SvgIcon>
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
-      </PerfectScrollbar>
-      <TablePagination
-        component="div"
-        count={products.length}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleLimitChange}
-        page={page}
-        rowsPerPage={limit}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
-    </Card>
+                      <TableCell>
+                        {getStatusLabel(product.status)}
+                      </TableCell>
+                      <TableCell>
+                        {product.description}
+                      </TableCell>
+                      <TableCell>
+                        {moment(product.updatedAt).format('DD/MM/YYYY')}
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton
+                          component={RouterLink}
+                          to={"/app/products/productEdit/" + product._id}
+                        >
+                          <SvgIcon fontSize="small">
+                            <EditIcon />
+                          </SvgIcon>
+                        </IconButton>
+                        <IconButton
+                          onClick={() => { if (window.confirm('Are you really want to delete?')) deleteProduct(product._id) }}
+                        >
+                          <SvgIcon fontSize="small">
+                            <DeleteIcon />
+                          </SvgIcon>
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Box>
+        </PerfectScrollbar>
+        <TablePagination
+          component="div"
+          count={products.length}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleLimitChange}
+          page={page}
+          rowsPerPage={limit}
+          rowsPerPageOptions={[5, 10, 25]}
+        />
+      </Card>
+    </>
   );
 }
 

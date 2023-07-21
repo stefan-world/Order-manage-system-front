@@ -256,7 +256,7 @@ function Results({ className, accounts, deletAccount, ...rest }) {
                       {account.country}
                     </TableCell>
                     <TableCell>
-                      {account.company_eamil}
+                      {account.company_email}
                     </TableCell>
                     <TableCell>
                     {getStatusLabel(account.status)}

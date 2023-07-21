@@ -38,7 +38,7 @@ function EditForm({ className, onSubmitSuccess, account, ...rest }) {
         state: account.state,
         postcode: account.postcode,
         country: account.country,
-        company_eamil: account.company_eamil,
+        company_email: account.company_email,
         status: account.status
       }}
       validationSchema={Yup.object().shape({
@@ -46,15 +46,15 @@ function EditForm({ className, onSubmitSuccess, account, ...rest }) {
         primary_contact_firstname: Yup.string().max(255).required('Primary Contact First Name is required'),
         primary_contact_lastname: Yup.string().max(255).required('Primary Contact Last Name is required'),
         primary_contact_mobile: Yup.string().max(255).required('Primary Contact Mobile is required'),
-        primary_contact_email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-        address_line1: Yup.string().max(255).required('Primary Contact First Name is required'),
-        address_line2: Yup.string().max(255).required('Primary Contact Last Name is required'),
-        city: Yup.string().max(255).required('Primary Contact Mobile is required'),
-        state: Yup.string().max(255).required('Primary Contact Email is required'),
-        postcode: Yup.string().max(255).required('Primary Contact First Name is required'),
-        country: Yup.string().max(255).required('Primary Contact Last Name is required'),
-        company_eamil: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-        status: Yup.string().max(255).required('Primary Contact Email is required'),
+        primary_contact_email: Yup.string().email('Must be a valid email').max(255).required('Primary Contact Email is required'),
+        address_line1: Yup.string().max(255).required('Address Line 1 is required'),
+        address_line2: Yup.string().max(255).required('Address Line 2 is required'),
+        city: Yup.string().max(255).required('City is required'),
+        state: Yup.string().max(255).required('State is required'),
+        postcode: Yup.string().max(255).required('Postcode is required'),
+        country: Yup.string().max(255).required('Country is required'),
+        company_email: Yup.string().email('Must be a valid email').max(255).required('Company Email is required'),
+        status: Yup.string().max(255).required('Status Email is required'),
       })}
       onSubmit={async (values, {
         setErrors,
@@ -64,13 +64,13 @@ function EditForm({ className, onSubmitSuccess, account, ...rest }) {
         try {
           const {
             account_name, primary_contact_firstname, primary_contact_lastname, primary_contact_mobile, 
-            primary_contact_email, address_line1, address_line2, city, state, postcode, country, company_eamil, status
+            primary_contact_email, address_line1, address_line2, city, state, postcode, country, company_email, status
           } = values;
           var data = '';
 
           await axios.post(API_BASE_URL + '/accounts/update', {
             id, account_name, primary_contact_firstname, primary_contact_lastname, primary_contact_mobile, 
-            primary_contact_email, address_line1, address_line2, city, state, postcode, country, company_eamil, status
+            primary_contact_email, address_line1, address_line2, city, state, postcode, country, company_email, status
           })
             .then((response) => {
               data = response.data;
@@ -253,16 +253,16 @@ function EditForm({ className, onSubmitSuccess, account, ...rest }) {
             variant="outlined"
           />
           <TextField
-            error={Boolean(touched.company_eamil && errors.company_eamil)}
+            error={Boolean(touched.company_email && errors.company_email)}
             fullWidth
-            helperText={touched.company_eamil && errors.company_eamil}
+            helperText={touched.company_email && errors.company_email}
             label="Company Email"
             margin="normal"
-            name="company_eamil"
+            name="company_email"
             onBlur={handleBlur}
             onChange={handleChange}
-            type="company_eamil"
-            value={values.company_eamil}
+            type="company_email"
+            value={values.company_email}
             variant="outlined"
           />
           <TextField
