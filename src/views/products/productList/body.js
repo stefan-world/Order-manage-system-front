@@ -369,7 +369,7 @@ function Results({ className, products, deleteProduct, ...rest }) {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        {loading && <LinearProgress variant="determinate" value={progress} style={{ width: '50%', height: '10px', marginTop: '-10px'}} />}
+        {loading && <LinearProgress variant="determinate" value={progress} style={{ width: '100%', height: '10px', marginTop: '-10px'}} />}
       </div>
       <Card
         className={clsx(classes.root, className)}
